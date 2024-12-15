@@ -1,5 +1,3 @@
-import { OutputFileEntry } from "@uploadcare/react-uploader";
-
 export interface UserLogIn {
     email: string;
     password: string;
@@ -27,7 +25,7 @@ export interface Post{
     caption: string;
     photos: PhotoMeta[];
     likes:number;
-    userlikes: [];
+    userlikes: string[];
     userId: string|null;
     date:Date;
 }
@@ -42,7 +40,7 @@ export interface DocumentResponse{
     caption: string;
     photos: PhotoMeta[];
     likes:number;
-    userlikes: [];
+    userlikes: string[];
     userId: string|null;
     date:Date;
 
