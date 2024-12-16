@@ -6,9 +6,10 @@ import { FileEntry } from '@/types';
 interface IFileUploaderProps {
     fileEntry: FileEntry;
     onChange: (fileEntry: FileEntry) => void;
+    preview:boolean
 }
 
-const FileUploader: React.FC<IFileUploaderProps> = ({ fileEntry, onChange }) => {
+const FileUploader: React.FC<IFileUploaderProps> = ({ fileEntry, onChange, preview}) => {
     const handleUploaderChange = (info: OutputCollectionState) => {
         const files = info.successEntries;
         if (!files.length) return;
@@ -22,7 +23,7 @@ const FileUploader: React.FC<IFileUploaderProps> = ({ fileEntry, onChange }) => 
         }));
         
         onChange({
-            files: [...fileEntry.files, ...newFiles]
+            files: preview ? [...fileEntry.files, ...newFiles] : [newFiles[0]]
         });
     };
 
@@ -33,8 +34,9 @@ const FileUploader: React.FC<IFileUploaderProps> = ({ fileEntry, onChange }) => 
                 onChange={handleUploaderChange}
                 className="uc-light"
                 pubkey={import.meta.env.VITE_UPLOADCAREKEY}
+                multiple={false}
             />
-
+            {preview && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {fileEntry.files.map((file) => (
                     <div key={file.uuid} className="relative aspect-square">
@@ -56,6 +58,7 @@ const FileUploader: React.FC<IFileUploaderProps> = ({ fileEntry, onChange }) => 
                     </div>
                 ))}
             </div>
+            )}
         </div>
     );
 };

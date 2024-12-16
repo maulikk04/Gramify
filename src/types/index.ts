@@ -1,3 +1,5 @@
+import { User } from "firebase/auth";
+
 export interface UserLogIn {
     email: string;
     password: string;
@@ -27,6 +29,8 @@ export interface Post{
     likes:number;
     userlikes: string[];
     userId: string|null;
+    username:string;
+    photoUrl:string;
     date:Date;
 }
 
@@ -41,7 +45,30 @@ export interface DocumentResponse{
     photos: PhotoMeta[];
     likes:number;
     userlikes: string[];
+    username:string;
+    photoUrl:string;
     userId: string|null;
     date:Date;
 
+}
+
+export interface ProfileInfo {
+    user: User;
+    displayName: string;
+    photoUrl: string;
+}
+
+export interface UserProfile {
+    userId: String;
+    displayName: string;
+    photoUrl: string;
+    userBio: string;
+}
+
+export interface ProfileResponse {
+    id:string;
+    userId: String;
+    displayName: string;
+    photoUrl: string;
+    userBio: string;
 }
