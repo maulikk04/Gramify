@@ -7,6 +7,7 @@ import CreatePost from "./pages/post";
 import Profile from "./pages/profile";
 import MyPhotos from "./pages/myPhotos";
 import ProtectedRoutes from "./components/ProtectedRoutes";
+import EditProfile from "./pages/profile/editProfile";
 export const router = createBrowserRouter([
     {
         element: <ProtectedRoutes />,
@@ -24,6 +25,11 @@ export const router = createBrowserRouter([
             {
                 path:"/profile",
                 element: <Profile />,
+                errorElement: <Error />,
+            },
+            {
+                path:"/edit-profile",
+                element: <EditProfile />,
                 errorElement: <Error />,
             },
             {

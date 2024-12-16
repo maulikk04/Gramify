@@ -25,6 +25,8 @@ const CreatePost: React.FunctionComponent<ICreatePostProps> = (props) => {
     likes:0,
     userlikes:[],
     userId: null,
+    username:user?.displayName || "Guest_User",
+    photoUrl:user?.photoURL || "",
     date:new Date(),
   })
 
@@ -43,7 +45,9 @@ const CreatePost: React.FunctionComponent<ICreatePostProps> = (props) => {
       const newPost:Post = {
         ...post,
         userId: user?.uid || null,
-        photos : photoMeta
+        photos : photoMeta,
+        username: user?.displayName!,
+        photoUrl: user?.photoURL!, 
       }
 
       console.log("Final Post " , newPost)
@@ -64,11 +68,11 @@ const CreatePost: React.FunctionComponent<ICreatePostProps> = (props) => {
             <form onSubmit={handleSubmit}>
               <div className='flex flex-col'>
                 <Label className='mb-4' htmlFor='caption'>Photo Caption</Label>
-                <Textarea className='mb-8' id="caption" placeholder="What's in your photo!" value={post.caption} onChange={(e)=>setPost({...post, caption:e.target.value})} />
+                <Textarea className='mb-8' id="caption" placeholder="What's in your photo!" value={post.caption} onChange={(e:React.ChangeEvent<HTMLTextAreaElement>)=>setPost({...post, caption:e.target.value})} />
               </div>
               <div className='flex flex-col'>
                 <Label className='mb-4' htmlFor='photo'>Photos</Label>
-                <FileUploader fileEntry={fileEntry} onChange={setFileEntry}/>
+                <FileUploader fileEntry={fileEntry} onChange={setFileEntry} preview={true}/>
               </div>
               <Button className='mt-8 w-32' type='submit'>Post</Button>
             </form>
