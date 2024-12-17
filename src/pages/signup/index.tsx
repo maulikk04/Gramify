@@ -6,8 +6,8 @@ import { Label } from '@/components/ui/label';
 import { UserSignIn } from '@/types';
 import { useUserAuth } from "@/context/userAuthContext";
 import { Link, useNavigate } from "react-router-dom";
-import image1 from "@/assets/images/image1.png"
 import * as React from 'react';
+import { motion } from "framer-motion";
 
 interface ISignupProps {
 
@@ -41,70 +41,115 @@ const Signup: React.FunctionComponent<ISignupProps> = () => {
     }
   }
   return (
-    <div className="bg-slate-800 w-full h-screen">
-      <div className="container mx-auto p-6 flex h-full">
-      <div className="hidden lg:flex w-1/2 items-center justify-center">
-          <img src={image1} alt="Signup Visual" className="max-w-full h-auto rounded-xl shadow-lg" />
-        </div>
-      <div className="flex justify-center items-center w-full">
-      <div className="max-w-sm rounded-xl border bg-card text-card-foreground shadow-sm">
-        <Card>
-          <form onSubmit={handleSubmit}>
-            <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl text-center mb 4">Gramify</CardTitle>
-              <CardDescription>
-                Enter your email below to create your account
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="grid">
-                <Button variant="outline" onClick={handleGoogleSignIn}>
-                  <Icons.google className="mr-2 h-4 w-4" />
-                  Google
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-blue-950 via-purple-900 to-blue-950">
+      {/* Animated background circles */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(5)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full bg-purple-600/10 animate-pulse"
+            style={{
+              width: `${Math.random() * 400 + 100}px`,
+              height: `${Math.random() * 400 + 100}px`,
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animation: `float ${Math.random() * 10 + 5}s infinite`,
+              animationDelay: `${Math.random() * 2}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="container relative mx-auto flex min-h-screen items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <Card className="backdrop-blur-sm bg-white/90">
+            <form onSubmit={handleSubmit}>
+              <CardHeader className="space-y-1">
+                <motion.div
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="text-center mb-6"
+                >
+                  <h1 className="text-4xl font-satisfy bg-gradient-to-r from-purple-400 to-pink-600 
+                               bg-clip-text text-transparent animate-gradient">
+                    Gramify
+                  </h1>
+                  <p className="text-sm text-gray-500 mt-2">Join our community today</p>
+                </motion.div>
+                <CardDescription>
+                  Create your account to get started
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="grid gap-4">
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  className="grid gap-4"
+                >
+                  <Button variant="outline" onClick={handleGoogleSignIn}
+                          className="hover:bg-gray-50 transition-all duration-200">
+                    <Icons.google className="mr-2 h-4 w-4" />
+                    Sign up with Google
+                  </Button>
+                </motion.div>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-muted-foreground">
+                      Or continue with email
+                    </span>
+                  </div>
+                </div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="grid gap-4"
+                >
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" placeholder="m@example.com" 
+                           value={userInfo.email}
+                           onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input id="password" type="password" placeholder="Password"
+                           value={userInfo.password}
+                           onChange={(e) => setUserInfo({ ...userInfo, password: e.target.value })}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="confirmpassword">Confirm Password</Label>
+                    <Input id="confirmpassword" type="password" placeholder="Confirm Password"
+                           value={userInfo.confirmPassword}
+                           onChange={(e) => setUserInfo({ ...userInfo, confirmPassword: e.target.value })}
+                    />
+                  </div>
+                </motion.div>
+              </CardContent>
+
+              <CardFooter className="flex flex-col gap-4">
+                <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 
+                                 hover:from-purple-600 hover:to-pink-600 transition-all duration-200" 
+                        type="submit">
+                  Create Account
                 </Button>
-              </div>
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">
-                    Or continue with
-                  </span>
-                </div>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="m@example.com" value={userInfo.email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setUserInfo({ ...userInfo, email: e.target.value })
-                  }
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder='Password' value={userInfo.password}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setUserInfo({ ...userInfo, password: e.target.value })
-                  } />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="confirmpassword">Confirm Password</Label>
-                <Input id="confirmpassword" type="password" placeholder='Confirm Password' value={userInfo.confirmPassword}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setUserInfo({ ...userInfo, confirmPassword: e.target.value })
-                  } />
-              </div>
-            </CardContent>
-            <CardFooter className="flex flex-col">
-              <Button className="w-full" type='submit'>Signup</Button>
-              <p className="mt-3 text-sm text-center">
-                Already have an account ? <Link to="/login">Login</Link>
-              </p>
-            </CardFooter>
-          </form>
-        </Card>
-        </div>
+                <p className="text-sm text-center text-gray-600">
+                  Already have an account?{" "}
+                  <Link to="/login" className="text-purple-600 hover:text-purple-700 font-semibold">
+                    Sign in
+                  </Link>
+                </p>
+              </CardFooter>
+            </form>
+          </Card>
         </div>
       </div>
     </div>

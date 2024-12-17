@@ -60,7 +60,9 @@ const Sidebar: React.FunctionComponent<ISidebarProps> = (props) => {
   return (
     <nav className='flex flex-col space-x-2 relative h-screen max-w-sw w-full '>
       <div className='flex justify-center m-5'>
-        <div className='text-white text-lg'>
+      <div className='text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 
+                       text-3xl font-bold tracking-wider hover:scale-105 transition-transform
+                       duration-200 cursor-pointer font-satisfy'>
           Gramify
         </div>
       </div>
