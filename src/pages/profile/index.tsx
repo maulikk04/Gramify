@@ -8,6 +8,11 @@ import { Edit2Icon, HeartIcon } from 'lucide-react';
 import { getPostsByUserId } from '@/repository/post.service';
 import { useNavigate } from 'react-router-dom';
 import { getUserProfile } from '@/repository/user.service';
+import PageTransition from '@/components/PageTransition';
+import { motion } from 'framer-motion';
+import AnimatedBackground from '@/components/AnimatedBackground';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+
 interface IProfileProps {
 
 }
@@ -84,35 +89,50 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
   }, [user])
   return (
     <Layout>
-      <div className='flex justify-center'>
-        <div className='border max-w-3xl w-full'>
-          <h3 className='bg-slate-800 text-white text-center text-lg p-2'>
-            Profile</h3>
-          <div className='p-8 pb-4  border-b'>
-            <div className='flex felx-row items-center pb-2 mb-2'>
-              <div className='mr-2'>
-                <img src={userInfo.photoUrl ? userInfo.photoUrl : image1} alt="avatar" className='w-28 h-28 rounded-full border=2 border-slate-800 object-cover'></img>
-              </div>
-              <div>
-                <div className='text-xl ml-3'>{userInfo.displayName ? userInfo.displayName: "Guest_User"}</div>
-                <div className='text-xl ml-3'>{user?.email ? user.email : ""}</div>
-              </div>
+      <PageTransition>
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+          <AnimatedBackground />
+          <motion.div 
+            className='container mx-auto px-4 py-8'
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className='max-w-3xl mx-auto'>
+              <Card className="overflow-hidden backdrop-blur-sm bg-white/90">
+                <CardHeader>
+                  <CardTitle className="text-2xl font-satisfy bg-gradient-to-r from-purple-400 to-pink-600 
+                                      bg-clip-text text-transparent text-center">
+                    Profile
+                  </CardTitle>
+                </CardHeader>
+                <div className='p-8 pb-4  border-b'>
+                  <div className='flex felx-row items-center pb-2 mb-2'>
+                    <div className='mr-2'>
+                      <img src={userInfo.photoUrl ? userInfo.photoUrl : image1} alt="avatar" className='w-28 h-28 rounded-full border=2 border-slate-800 object-cover'></img>
+                    </div>
+                    <div>
+                      <div className='text-xl ml-3'>{userInfo.displayName ? userInfo.displayName: "Guest_User"}</div>
+                      <div className='text-xl ml-3'>{user?.email ? user.email : ""}</div>
+                    </div>
+                  </div>
+                  <div className='mb-4'>{userInfo.userBio}</div>
+                  <div>
+                    <Button onClick={editProfile}>
+                      <Edit2Icon className='mr-2 h-4 w-4' />Edit Profile
+                    </Button>
+                  </div>
+                </div>
+                <div className='p-8'>
+                  <h2 className='mb-5'>My Posts</h2>
+                  <div className='grid grid-cols-2 md:grid-cols-3 gap-2'>
+                    {data ? renderPost() : <div>...Loading</div>}
+                  </div>
+                </div>
+              </Card>
             </div>
-            <div className='mb-4'>{userInfo.userBio}</div>
-            <div>
-              <Button onClick={editProfile}>
-                <Edit2Icon className='mr-2 h-4 w-4' />Edit Profile
-              </Button>
-            </div>
-          </div>
-          <div className='p-8'>
-            <h2 className='mb-5'>My Posts</h2>
-            <div className='grid grid-cols-2 md:grid-cols-3 gap-2'>
-              {data ? renderPost() : <div>...Loading</div>}
-            </div>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </PageTransition>
     </Layout>
   );
 }

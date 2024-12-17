@@ -6,6 +6,8 @@ import image1 from '@/assets/images/image1.png'
 import { HeartIcon, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { updateLikesOnPost } from '@/repository/post.service';
+import { motion } from 'framer-motion';
+
 interface IPostCardProps{
     data: DocumentResponse;
 }
@@ -35,7 +37,12 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
     }
 
     return (
-        <Card className='mb-6'>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Card className='mb-6 card-gradient'>
             <CardHeader className='flex flex-col p-3'>
                 <CardTitle className='text-sm text-center flex justify-start item-center'>
                     <span className='mr-2'>
@@ -48,7 +55,7 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
                 <img src={data.photos? data.photos[0].cdnUrl : ""} />
             </CardContent>
             <CardFooter className='flex flex-col p-3'>
-                <div className='flex justify-betwenn w-full mb-3'>
+                <div className='flex justify-between w-full mb-3'>
                     <HeartIcon className={cn(
                         "mr-3", "cursor-pointer", likesInfo.isLike ? "fill-red-500":"fill-none"
                     )} 
@@ -61,7 +68,8 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
                     <span>{data.username}</span> : {data.caption}
                 </div>
             </CardFooter>
-        </Card>
+          </Card>
+        </motion.div>
     );
 }
 

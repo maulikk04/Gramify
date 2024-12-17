@@ -4,6 +4,10 @@ import { getPostsByUserId } from '@/repository/post.service';
 import { DocumentResponse, Post } from '@/types';
 import * as React from 'react';
 import { HeartIcon} from "lucide-react";
+import { motion } from 'framer-motion';
+import PageTransition from '@/components/PageTransition';
+import AnimatedBackground from '@/components/AnimatedBackground';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface IMyPhotosProps {
 
@@ -55,18 +59,32 @@ const MyPhotos: React.FunctionComponent<IMyPhotosProps> = (props) => {
   }
   return (
     <Layout>
-      <div className='flex justify-center'>
-        <div className='border max-w-3x6 w-full'>
-          <h3 className='bg-slate-800 text-white text-center text-lg p-2'>
-            My Photos
-          </h3>
-          <div className='p-8'>
-              <div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
-                {data? renderPost(): <div>...Loading</div>}
-              </div>
-          </div>
+      <PageTransition>
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+          <AnimatedBackground />
+          <motion.div 
+            className='container mx-auto px-4 py-8'
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className='max-w-3xl mx-auto'>
+              <Card className="overflow-hidden backdrop-blur-sm bg-white/90">
+                <CardHeader>
+                  <CardTitle className="text-2xl font-satisfy bg-gradient-to-r from-purple-400 to-pink-600 
+                                      bg-clip-text text-transparent text-center">
+                    My Photos
+                  </CardTitle>
+                </CardHeader>
+                <div className='p-8'>
+                  <div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
+                    {data? renderPost(): <div>...Loading</div>}
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </motion.div>
         </div>
-      </div>
+      </PageTransition>
     </Layout>
   );
 }
