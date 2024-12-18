@@ -33,10 +33,30 @@ export const getPosts = async () => {
     }
 }
 
-export const getPostsByUserId = (userId: string) => {
-    const q = query(collection(db, COLLECTION_NAME), where("userId", "==", userId), orderBy("date", "desc"));
-    return getDocs(q);
-}
+export const getPostsByUserId = async (userId: string) => {
+    try {
+        const q = query(collection(db, COLLECTION_NAME), where("userId", "==", userId), orderBy("date", "desc"));
+        const querySnapshot = await getDocs(q);
+        const tempArr: DocumentResponse[] = [];
+        if (querySnapshot.size > 0) {
+            querySnapshot.forEach((doc) => {
+                const data = doc.data() as Post;
+                const responseObj: DocumentResponse = {
+                    id: doc.id,
+                    ...data
+                };
+                tempArr.push(responseObj);
+            });
+            return tempArr;
+        } else {
+            console.log("No data found");
+            return [];
+        }
+    } catch (error) {
+        console.log(error);
+        return [];
+    }
+};
 
 export const getPost = (id: string) => {
     const docRef = doc(db, COLLECTION_NAME, id);
@@ -61,7 +81,7 @@ export const updateUserInfoOnPosts = async(ProfileInfo: ProfileInfo)=>{
     if(querySnapshot.size > 0){
         querySnapshot.forEach(async(document)=>{
             const docRef = doc(db,COLLECTION_NAME,document.id);
-            await updateDoc(docRef,{
+            await updateDoc(docRef, {
                 username:ProfileInfo.displayName,
                 photoUrl:ProfileInfo.photoUrl
             })

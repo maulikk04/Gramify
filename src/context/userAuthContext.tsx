@@ -2,6 +2,7 @@ import { createUserWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged,
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../firebaseConfig"
 import { ProfileInfo } from "@/types";
+import { createUserProfile } from "@/repository/user.service";
 
 interface IUserAuthProviderProps {
     children: React.ReactNode;
@@ -20,17 +21,37 @@ const logIn = (email: string, password: string) => {
     return signInWithEmailAndPassword(auth, email, password);
 }
 
-const signUp = (email: string, password: string) => {
-    return createUserWithEmailAndPassword(auth, email, password);
+const signUp = async (email: string, password: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    await createUserProfile({
+        userId: user.uid,
+        displayName: user.displayName || "",
+        photoUrl: user.photoURL || "",
+        userBio: "Please update your bio"
+    });
+    return userCredential;
 }
 
 const logOut = () => {
     signOut(auth);
 }
 
-const googleSignIn = () => {
+const googleSignIn = async () => {
     const googleAuthProvider = new GoogleAuthProvider();
-    return signInWithPopup(auth, googleAuthProvider);
+    const userCredential = await signInWithPopup(auth, googleAuthProvider);
+    console.log("User Credential: ", userCredential);
+    
+    const user = userCredential.user;
+
+    await createUserProfile({
+        userId: user.uid,
+        displayName: user.displayName || "",
+        photoUrl: user.photoURL || "",
+        userBio: "Please update your bio"
+    });
+    return userCredential;
 }
 
 const updateProfileInfo = (profileInfo: ProfileInfo)=>{

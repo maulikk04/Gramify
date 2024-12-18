@@ -9,7 +9,14 @@ import { Link, useNavigate } from "react-router-dom";
 import * as React from 'react';
 import { motion } from "framer-motion";
 
+
 interface ILoginProps {
+}
+
+interface FormErrors {
+  email?: string;
+  password?: string;
+  general?: string;
 }
 
 const initialValue: UserLogIn = {
@@ -21,16 +28,39 @@ const Login: React.FunctionComponent<ILoginProps> = () => {
   const { googleSignIn, logIn } = useUserAuth();
     const navigate = useNavigate();
     const [userLogInInfo, setUserInfo] = React.useState<UserLogIn>(initialValue);
-    const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
+    const [errors, setErrors] = React.useState<FormErrors>({});
+    const [isLoading, setIsLoading] = React.useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
+      setIsLoading(true);
+      setErrors({});
+      
       try {
-        console.log("User info is: ", userLogInInfo);
+        if (!userLogInInfo.email) {
+          setErrors(prev => ({ ...prev, email: 'Email is required' }));
+          setIsLoading(false);
+          return;
+        }
+        if (!userLogInInfo.password) {
+          setErrors(prev => ({ ...prev, password: 'Password is required' }));
+          setIsLoading(false);
+          return;
+        }
+        
         await logIn(userLogInInfo.email, userLogInInfo.password);
         navigate("/");
-      } catch (error) {
-        console.log(error);
+      } catch (error: any) {
+        setErrors({
+          general: error.code === 'auth/invalid-credential' 
+            ? 'Invalid email or password'
+            : error.message || 'An error occurred during login'
+        });
+      } finally {
+        setIsLoading(false);
       }
     }
+
     const handleGoogleSignIn = async (e: React.MouseEvent<HTMLElement>) => {
       e.preventDefault();
       try {
@@ -83,6 +113,9 @@ const Login: React.FunctionComponent<ILoginProps> = () => {
               </CardHeader>
 
               <CardContent className="grid gap-4">
+                {errors.general && (
+                  <div className="text-red-500 text-sm text-center">{errors.general}</div>
+                )}
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   className="grid gap-4"
@@ -111,22 +144,41 @@ const Login: React.FunctionComponent<ILoginProps> = () => {
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setUserInfo({ ...userLogInInfo, email: e.target.value })
                     }
+                    className={errors.email ? "border-red-500" : ""}
                   />
+                  {errors.email && (
+                    <div className="text-red-500 text-sm">{errors.email}</div>
+                  )}
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="password">Password</Label>
                   <Input id="password" type="password" placeholder='Password' value={userLogInInfo.password}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setUserInfo({ ...userLogInInfo, password: e.target.value })
-                    } />
+                    } 
+                    className={errors.password ? "border-red-500" : ""}
+                  />
+                  {errors.password && (
+                    <div className="text-red-500 text-sm">{errors.password}</div>
+                  )}
                 </div>
               </CardContent>
 
               <CardFooter className="flex flex-col gap-4">
-                <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 
-                                 hover:from-purple-600 hover:to-pink-600 transition-all duration-200" 
-                        type='submit'>
-                  Sign In
+                <Button 
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 
+                            hover:from-purple-600 hover:to-pink-600 transition-all duration-200"
+                  type="submit"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      Signing in...
+                    </div>
+                  ) : (
+                    "Sign In"
+                  )}
                 </Button>
                 <p className="text-sm text-center text-gray-600">
                   Don't have an account?{" "}

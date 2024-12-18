@@ -59,16 +59,14 @@ export interface ProfileInfo {
 }
 
 export interface UserProfile {
-    userId: String;
+    userId: string;
     displayName: string;
     photoUrl: string;
     userBio: string;
+    followers?: string[];
+    following?: string[];
 }
 
-export interface ProfileResponse {
-    id:string;
-    userId: String;
-    displayName: string;
-    photoUrl: string;
-    userBio: string;
+export interface ProfileResponse extends UserProfile {
+    id: string;
 }

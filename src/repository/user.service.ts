@@ -71,3 +71,45 @@ export const getAllUsers = async (userId:string) =>{
         console.log(error);
     }
 }
+
+export const followUser = async (followerId: string, followingId: string) => {
+    try {
+        const followerDoc = await getUserProfile(followerId);
+        const followingDoc = await getUserProfile(followingId);
+
+        if (followerDoc && followingDoc) {
+            await updateUserProfile(followerDoc.id, {
+                ...followerDoc,
+                following: [...(followerDoc.following || []), followingId]
+            });
+
+            await updateUserProfile(followingDoc.id, {
+                ...followingDoc,
+                followers: [...(followingDoc.followers || []), followerId]
+            });
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const unfollowUser = async (followerId: string, followingId: string) => {
+    try {
+        const followerDoc = await getUserProfile(followerId);
+        const followingDoc = await getUserProfile(followingId);
+
+        if (followerDoc && followingDoc) {
+            await updateUserProfile(followerDoc.id, {
+                ...followerDoc,
+                following: (followerDoc.following || []).filter(id => id !== followingId)
+            });
+
+            await updateUserProfile(followingDoc.id, {
+                ...followingDoc,
+                followers: (followingDoc.followers || []).filter(id => id !== followerId)
+            });
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};

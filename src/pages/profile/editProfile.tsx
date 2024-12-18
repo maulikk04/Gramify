@@ -53,7 +53,7 @@ const EditProfile: React.FC<IEditProfileProps> = (props) => {
             }
             updateProfileInfo(profileInfo)
             updateUserInfoOnPosts(profileInfo)
-            navigate("/profile");
+            navigate(`/profile/${user?.uid}`);
         } catch (error) {
             console.log(error);
 
@@ -115,7 +115,7 @@ const EditProfile: React.FC<IEditProfileProps> = (props) => {
                                         </div>
 
                                         <Button className='mt-4 w-32 mr-8' type='submit'>Update</Button>
-                                        <Button variant="destructive" className='mt-4 w-32 mr-8' onClick={() => navigate("/profile")}>Cancel</Button>
+                                        <Button variant="destructive" className='mt-4 w-32 mr-8' onClick={() => navigate(`/profile/${user?.uid}`)}>Cancel</Button>
                                     </form>
                                 </div>
                             </Card>
