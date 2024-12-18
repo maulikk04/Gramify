@@ -11,52 +11,52 @@ import { Link, useLocation } from 'react-router-dom';
 import { buttonVariants } from '../ui/button';
 import { cn } from '@/lib/utils';
 import { useUserAuth } from '@/context/userAuthContext';
-import path from 'path';
 
 interface ISidebarProps {
 
 }
 
-const navItems = [
-  {
-    name: "Home",
-    link: "/",
-    icon: homeIcon
-  },
-  {
-    name: "Add Photos",
-    link: "/post",
-    icon: addIcon
-  },
-  {
-    name: "My Photos",
-    link: "/myphotos",
-    icon: myphotoIcon
-  },
-  {
-    name: "Profile",
-    link: "/profile",
-    icon: profileIcon
-  },
-  {
-    name: "Notifications",
-    link: "#",
-    icon: notificationIcon
-  },
-  {
-    name: "Direct",
-    link: "#",
-    icon: directIcon
-  },
-  {
-    name: "Settings",
-    link: "#",
-    icon: settingIcon
-  }
-]
 const Sidebar: React.FunctionComponent<ISidebarProps> = (props) => {
   const { pathname } = useLocation();
-  const { logOut } = useUserAuth();
+  const { logOut, user } = useUserAuth();  
+  
+  const navItems = [
+    {
+      name: "Home",
+      link: "/",
+      icon: homeIcon
+    },
+    {
+      name: "Add Photos",
+      link: "/post",
+      icon: addIcon
+    },
+    {
+      name: "My Photos",
+      link: "/myphotos",
+      icon: myphotoIcon
+    },
+    {
+      name: "Profile",
+      link: `/profile/${user?.uid}`,  
+      icon: profileIcon
+    },
+    {
+      name: "Notifications",
+      link: "#",
+      icon: notificationIcon
+    },
+    {
+      name: "Direct",
+      link: "#",
+      icon: directIcon
+    },
+    {
+      name: "Settings",
+      link: "#",
+      icon: settingIcon
+    }
+  ]
   return (
     <nav className='flex flex-col space-x-2 relative h-screen max-w-sw w-full '>
       <div className='flex justify-center m-5'>
