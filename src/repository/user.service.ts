@@ -1,6 +1,6 @@
 import { db } from "@/firebaseConfig";
 import { ProfileResponse, UserProfile } from "@/types";
-import { addDoc, collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { addDoc, collection, doc, getDocs, query, updateDoc, where, arrayUnion, arrayRemove, getDoc } from "firebase/firestore";
 
 const COLLECTION_NAME = "users";
 
@@ -72,44 +72,77 @@ export const getAllUsers = async (userId:string) =>{
     }
 }
 
-export const followUser = async (followerId: string, followingId: string) => {
+export const getUserDocIdByUserId = async (userId: string) => {
     try {
-        const followerDoc = await getUserProfile(followerId);
-        const followingDoc = await getUserProfile(followingId);
-
-        if (followerDoc && followingDoc) {
-            await updateUserProfile(followerDoc.id, {
-                ...followerDoc,
-                following: [...(followerDoc.following || []), followingId]
-            });
-
-            await updateUserProfile(followingDoc.id, {
-                ...followingDoc,
-                followers: [...(followingDoc.followers || []), followerId]
-            });
+        const q = query(collection(db, COLLECTION_NAME), where("userId", "==", userId));
+        const querySnapshot = await getDocs(q);
+        console.log("querySnapshot", querySnapshot);
+        
+        if (!querySnapshot.empty) {
+            return querySnapshot.docs[0].id;
         }
+        return null;
     } catch (error) {
-        console.log(error);
+        console.error("Error getting user doc id:", error);
+        return null;
     }
 };
 
-export const unfollowUser = async (followerId: string, followingId: string) => {
+export const followUser = async (currentUserId: string, targetUserId: string) => {
     try {
-        const followerDoc = await getUserProfile(followerId);
-        const followingDoc = await getUserProfile(followingId);
+        const currentUserDocId = await getUserDocIdByUserId(currentUserId);
+        const targetUserDocId = await getUserDocIdByUserId(targetUserId);
 
-        if (followerDoc && followingDoc) {
-            await updateUserProfile(followerDoc.id, {
-                ...followerDoc,
-                following: (followerDoc.following || []).filter(id => id !== followingId)
-            });
-
-            await updateUserProfile(followingDoc.id, {
-                ...followingDoc,
-                followers: (followingDoc.followers || []).filter(id => id !== followerId)
-            });
+        if (!currentUserDocId || !targetUserDocId) {
+            throw new Error("User document not found");
         }
+
+        const currentUserRef = doc(db, COLLECTION_NAME, currentUserDocId);
+        const targetUserRef = doc(db, COLLECTION_NAME, targetUserDocId);
+
+        await updateDoc(currentUserRef, {
+            following: arrayUnion(targetUserId)
+        });
+
+        await updateDoc(targetUserRef, {
+            followers: arrayUnion(currentUserId)
+        });
     } catch (error) {
-        console.log(error);
+        console.error("Error following user:", error);
+    }
+};
+
+export const unfollowUser = async (currentUserId: string, targetUserId: string) => {
+    try {
+        const currentUserDocId = await getUserDocIdByUserId(currentUserId);
+        const targetUserDocId = await getUserDocIdByUserId(targetUserId);
+
+        if (!currentUserDocId || !targetUserDocId) {
+            throw new Error("User document not found");
+        }
+
+        const currentUserRef = doc(db, COLLECTION_NAME, currentUserDocId);
+        const targetUserRef = doc(db, COLLECTION_NAME, targetUserDocId);
+
+        await updateDoc(currentUserRef, {
+            following: arrayRemove(targetUserId)
+        });
+
+        await updateDoc(targetUserRef, {
+            followers: arrayRemove(currentUserId)
+        });
+    } catch (error) {
+        console.error("Error unfollowing user:", error);
+    }
+};
+
+export const isFollowing = async (currentUserId: string, targetUserId: string) => {
+    try {
+        const userDoc = await getDoc(doc(db, 'users', currentUserId));
+        const userData = userDoc.data();
+        return userData?.following?.includes(targetUserId) || false;
+    } catch (error) {
+        console.error("Error checking follow status:", error);
+        return false;
     }
 };

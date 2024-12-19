@@ -70,3 +70,16 @@ export interface UserProfile {
 export interface ProfileResponse extends UserProfile {
     id: string;
 }
+
+export interface Comment {
+    postId: string;
+    userId: string;
+    username: string;
+    userPhotoUrl: string;
+    text: string;
+    date: Date;
+}
+
+export interface CommentResponse extends Comment {
+    id: string;
+}
