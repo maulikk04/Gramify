@@ -83,3 +83,25 @@ export interface Comment {
 export interface CommentResponse extends Comment {
     id: string;
 }
+
+export interface ChatMessage {
+  id?: string;
+  senderId: string;
+  receiverId: string;
+  content: string;
+  timestamp: number;
+}
+
+export interface ChatRoom {
+  id?: string;
+  participants: string[];
+  lastMessage?: string;
+  lastMessageTimestamp?: number;
+  unreadCount?: { [userId: string]: number }; 
+}
+
+export interface NotificationBadge {
+  count: number;
+  lastMessage: string;
+  timestamp: number;
+}

@@ -16,47 +16,38 @@ interface IMyPhotosProps {
 const MyPhotos: React.FunctionComponent<IMyPhotosProps> = (props) => {
   const {user} = useUserAuth();
   const [data,setData] = React.useState<DocumentResponse[]>([]);
-  const getAllPost = async (id:string)=>{
+
+  const getAllPost = async (id:string) => {
     try {
-      const querySnapshot = await getPostsByUserId(id);
-      const tempArr:DocumentResponse[] = [];
-      if(querySnapshot.size > 0){
-        querySnapshot.forEach((doc)=>{
-          const data = doc.data() as Post;
-          const responseObj :DocumentResponse = {
-            id: doc.id,
-            ...data
-          }
-          console.log("res obj" , responseObj)
-          tempArr.push(responseObj);
-        })
-        setData(tempArr);
-      } else {
-        console.log("No data found")
+      const posts = await getPostsByUserId(id);
+      if (posts && posts.length > 0) {
+        setData(posts);
       }
     } catch (error) {
       console.log(error);
     }
-  }
-  React.useEffect(()=>{
-    if(user != null){
+  };
+
+  React.useEffect(() => {
+    if(user != null) {
       getAllPost(user.uid);
     }
-  },[user])
+  },[user]);
 
-  const renderPost = ()=>{
-    return data.map((item)=>{
+  const renderPost = () => {
+    return data.map((item) => {
       return <div key={item.photos[0].uuid} className='relative'>
-          <div className='absolute group transition-all duration-200 bg-transparent hover:bg-slate-950 hover:bg-opacity-75 top-0 bottom-0 left-0 right-0 w-full h-full '>
+          <div className='absolute group transition-all duration-200 bg-transparent hover:bg-slate-950 hover:bg-opacity-75 top-0 bottom-0 left-0 right-0 w-full h-full'>
             <div className='flex flex-col justify-center items-center w-full h-full'>
               <HeartIcon className='hidden group-hover:block fill-white'/>
               <div className='hidden group-hover:block text-white'>{item.likes} likes</div>
             </div>
           </div>
-      <img src={`${item.photos[0].cdnUrl}/-/format/auto/-/quality/smart/-/resize/300x300/`} />
+          <img src={`${item.photos[0].cdnUrl}/-/format/auto/-/quality/smart/-/resize/300x300/`} />
       </div>
-    }) 
-  }
+    });
+  };
+
   return (
     <Layout>
       <PageTransition>
