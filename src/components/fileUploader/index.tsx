@@ -6,10 +6,11 @@ import { FileEntry } from '@/types';
 interface IFileUploaderProps {
     fileEntry: FileEntry;
     onChange: (fileEntry: FileEntry) => void;
-    preview:boolean
+    preview: boolean;
+    customStyle?: string;
 }
 
-const FileUploader: React.FC<IFileUploaderProps> = ({ fileEntry, onChange, preview}) => {
+const FileUploader: React.FC<IFileUploaderProps> = ({ fileEntry, onChange, preview, customStyle }) => {
     const handleUploaderChange = (info: OutputCollectionState) => {
         const files = info.successEntries;
         if (!files.length) return;
@@ -28,7 +29,7 @@ const FileUploader: React.FC<IFileUploaderProps> = ({ fileEntry, onChange, previ
     };
 
     return (
-        <div className="w-full space-y-4">
+        <div className={`w-full space-y-4 ${customStyle}`}>
             <FileUploaderRegular
                 sourceList="local, url, camera"
                 onChange={handleUploaderChange}
@@ -63,4 +64,4 @@ const FileUploader: React.FC<IFileUploaderProps> = ({ fileEntry, onChange, previ
     );
 };
 
-export default FileUploader; 
+export default FileUploader;

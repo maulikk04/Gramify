@@ -10,8 +10,8 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import EditProfile from "./pages/profile/editProfile";
 import Followers from "./pages/profile/Followers";
 import Following from "./pages/profile/Following";
-// import Followers from "./pages/profile/Followers";
-// import Following from "./pages/profile/Following";
+import Chat from "./pages/chat";
+import DirectMessages from "./pages/direct";
 
 export const router = createBrowserRouter([
     {
@@ -55,6 +55,16 @@ export const router = createBrowserRouter([
             {
                 path: "/myphotos",
                 element: <MyPhotos />,
+                errorElement: <Error />,
+            },
+            {
+                path: "/chat/:userId",
+                element: <Chat />,
+                errorElement: <Error />,
+            },
+            {
+                path: "/direct",
+                element: <DirectMessages />,
                 errorElement: <Error />,
             }
         ]
