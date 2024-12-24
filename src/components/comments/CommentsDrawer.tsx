@@ -2,6 +2,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { CommentResponse, DocumentResponse } from "@/types";
 import { Input } from "../ui/input";
 import { Send } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface CommentsDrawerProps {
     open: boolean;
@@ -41,7 +42,7 @@ const CommentsDrawer = ({
                                 alt={post.username}
                             />
                             <div className="text-gray-800">
-                                <span className="font-semibold mr-2">{post.username}</span>
+                                <Link to={`profile/${post.userId}`} className="font-semibold mr-2">{post.username}</Link>
                                 <span className="text-gray-600">{post.caption}</span>
                             </div>
                         </div>
@@ -55,7 +56,7 @@ const CommentsDrawer = ({
                                         alt={comment.username}
                                     />
                                     <div className="text-gray-800">
-                                        <span className="font-semibold mr-2">{comment.username}</span>
+                                        <Link to={`profile/${comment.userId}`} className="font-semibold mr-2">{comment.username}</Link>
                                         <span className="text-gray-600">{comment.text}</span>
                                     </div>
                                 </div>

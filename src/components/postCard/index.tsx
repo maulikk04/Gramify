@@ -62,21 +62,32 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
         }
     };
 
-    const updateLike= async (isVal:boolean)=>{
-        if(!user?.uid) return ;
-        setLikesInfo({
-            likes: isVal? likesInfo.likes+1:likesInfo.likes-1,
-            isLike : !likesInfo.isLike
-        })
-
-        if(isVal){
-            data.userlikes.push(user?.uid);
+    const updateLike = async (isVal: boolean) => {
+        if(!user?.uid) return;
+        
+        const newLikes = isVal ? likesInfo.likes + 1 : likesInfo.likes - 1;
+        const newUserLikes = [...data.userlikes];
+        
+        if(isVal) {
+            newUserLikes.push(user.uid);
         } else {
-            data.userlikes?.splice(data.userlikes.indexOf(user?.uid),1);
+            const index = newUserLikes.indexOf(user.uid);
+            if (index > -1) {
+                newUserLikes.splice(index, 1);
+            }
         }
 
-        await updateLikesOnPost(data.id , data.userlikes, isVal?likesInfo.likes+1 : likesInfo.likes-1)
-    }
+        await updateLikesOnPost(data.id, newUserLikes, newLikes, {
+            ...data,
+            likes: likesInfo.likes, 
+            userlikes: data.userlikes
+        });
+
+        setLikesInfo({
+            likes: newLikes,
+            isLike: !likesInfo.isLike
+        });
+    };
 
     const loadComments = async () => {
         const postComments = await getCommentsByPostId(data.id);
@@ -89,7 +100,7 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
     };
 
     const handleAddComment = async () => {
-        if (!user || !newComment.trim()) return;
+        if (!user || !newComment.trim() || !data.userId) return;
 
         const comment = {
             postId: data.id,
@@ -100,7 +111,7 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
             date: new Date()
         };
 
-        await createComment(comment);
+        await createComment(comment, data.userId);
         setNewComment('');
         loadComments();
     };

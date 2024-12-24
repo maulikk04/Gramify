@@ -1,12 +1,18 @@
-import { db } from "@/firebaseConfig";
+import { auth, db } from "@/firebaseConfig";
 import { ProfileResponse, UserProfile } from "@/types";
 import { addDoc, collection, doc, getDocs, query, updateDoc, where, arrayUnion, arrayRemove, getDoc } from "firebase/firestore";
+import { createNotification } from './notification.service';
+import { NotificationType } from '@/types';
 
 const COLLECTION_NAME = "users";
 
-export const createUserProfile = (user:UserProfile) =>{
+export const createUserProfile = (user: UserProfile) => {
     try {
-        return addDoc(collection(db, COLLECTION_NAME), user);
+        return addDoc(collection(db, COLLECTION_NAME), {
+            ...user,
+            followers: [],
+            following: []
+        });
     } catch (error) {
         console.log(error);
     }
@@ -107,6 +113,19 @@ export const followUser = async (currentUserId: string, targetUserId: string) =>
         await updateDoc(targetUserRef, {
             followers: arrayUnion(currentUserId)
         });
+
+        // Add notification
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+            await createNotification({
+                type: NotificationType.FOLLOW,
+                senderId: currentUserId,
+                receiverId: targetUserId,
+                senderName: currentUser.displayName || "",
+                senderPhoto: currentUser.photoURL || "",
+                message: "started following you"
+            });
+        }
     } catch (error) {
         console.error("Error following user:", error);
     }
@@ -131,6 +150,19 @@ export const unfollowUser = async (currentUserId: string, targetUserId: string) 
         await updateDoc(targetUserRef, {
             followers: arrayRemove(currentUserId)
         });
+
+        // Add notification
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+            await createNotification({
+                type: NotificationType.UNFOLLOW,
+                senderId: currentUserId,
+                receiverId: targetUserId,
+                senderName: currentUser.displayName || "",
+                senderPhoto: currentUser.photoURL || "",
+                message: "unfollowed you"
+            });
+        }
     } catch (error) {
         console.error("Error unfollowing user:", error);
     }

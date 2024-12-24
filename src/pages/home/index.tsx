@@ -17,17 +17,26 @@ interface IHomeProps {
 const Home: React.FunctionComponent<IHomeProps> = (props) => {
   const {user} = useUserAuth();
   const [data,setData] = React.useState<DocumentResponse[]>([]);
-  const getAllPost = async ()=>{
-    const response:DocumentResponse[] = await getPosts() || [];
-    console.log("all posts", response); 
-    
+  const getAllPost = React.useCallback(async () => {
+    const response: DocumentResponse[] = await getPosts() || [];
     setData(response);
-  }
-  React.useEffect(()=>{
-    if(user != null){
+  }, []);
+
+  React.useEffect(() => {
+    if (user != null) {
       getAllPost();
     }
-  },[]);
+  }, [user, getAllPost]);
+
+  React.useEffect(() => {
+    if (user) {
+      const interval = setInterval(() => {
+        getAllPost();
+      }, 10000); // Refresh every 10 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [user, getAllPost]);
 
   const renderPost = () => {
     return data.map((item)=>{

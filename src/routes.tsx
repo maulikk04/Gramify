@@ -12,6 +12,9 @@ import Followers from "./pages/profile/Followers";
 import Following from "./pages/profile/Following";
 import Chat from "./pages/chat";
 import DirectMessages from "./pages/direct";
+import NotificationsPage from "./pages/notifications";
+import SinglePost from "./pages/post/[id]"; 
+import Users from "./pages/users";
 
 export const router = createBrowserRouter([
     {
@@ -65,6 +68,21 @@ export const router = createBrowserRouter([
             {
                 path: "/direct",
                 element: <DirectMessages />,
+                errorElement: <Error />,
+            },
+            {
+                path: "/notifications",
+                element: <NotificationsPage />,
+                errorElement: <Error />,
+            },
+            {
+                path: "/post/:id",  
+                element: <SinglePost />,
+                errorElement: <Error />,
+            },
+            {
+                path: "/users",
+                element: <Users />,
                 errorElement: <Error />,
             }
         ]

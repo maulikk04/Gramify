@@ -114,7 +114,7 @@ const EditProfile: React.FC<IEditProfileProps> = (props) => {
                                                     setData({ ...data, userBio: e.target.value })} />
                                         </div>
 
-                                        <Button className='mt-4 w-32 mr-8' type='submit'>Update</Button>
+                                        <Button className='bg-gradient-to-r from-purple-400 to-pink-600 text-white mt-4 w-32 mr-8' type='submit'>Update</Button>
                                         <Button variant="destructive" className='mt-4 w-32 mr-8' onClick={() => navigate(`/profile/${user?.uid}`)}>Cancel</Button>
                                     </form>
                                 </div>
