@@ -8,11 +8,13 @@ import settingIcon from "@/assets/icons/setting.svg";
 import notificationIcon from "@/assets/icons/notification.svg";
 import profileIcon from "@/assets/icons/profile.svg";
 import logoutIcon from "@/assets/icons/logout.svg";
+import usersIcon from "@/assets/icons/icons8-users-30.png";
 import { Link, useLocation } from 'react-router-dom';
 import { buttonVariants } from '../ui/button';
 import { cn } from '@/lib/utils';
 import { useUserAuth } from '@/context/userAuthContext';
 import { getUnreadMessageCount } from '@/repository/chat.service';
+import { getUnreadNotificationCount } from '@/repository/notification.service';
 
 interface ISidebarProps {
 
@@ -21,13 +23,16 @@ interface ISidebarProps {
 const Sidebar: React.FunctionComponent<ISidebarProps> = (props) => {
   const { pathname } = useLocation();
   const { logOut, user } = useUserAuth();  
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   
   useEffect(() => {
     if (user) {
       const interval = setInterval(async () => {
-        const count = await getUnreadMessageCount(user.uid);
-        setUnreadCount(count);
+        const messageCount = await getUnreadMessageCount(user.uid);
+        const notificationCount = await getUnreadNotificationCount(user.uid);
+        setUnreadMessages(messageCount);
+        setUnreadNotifications(notificationCount);
       }, 5000); // Check every 5 seconds
 
       return () => clearInterval(interval);
@@ -57,14 +62,20 @@ const Sidebar: React.FunctionComponent<ISidebarProps> = (props) => {
     },
     {
       name: "Notifications",
-      link: "#",
-      icon: notificationIcon
+      link: "/notifications",
+      icon: notificationIcon,
+      badge: unreadNotifications > 0 ? unreadNotifications : undefined
+    },
+    {
+      name: "Users",
+      link: "/users",
+      icon: usersIcon
     },
     {
       name: "Direct",
       link: "/direct",  
       icon: directIcon,
-      badge: unreadCount > 0 ? unreadCount : undefined
+      badge: unreadMessages > 0 ? unreadMessages : undefined
     },
     {
       name: "Settings",

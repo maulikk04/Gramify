@@ -64,7 +64,7 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
   const renderPost = () => {
     return data.map((item) => {
       return (
-        <div key={item.id} className='relative'>
+        <div key={item.id} className='relative cursor-pointer' onClick={()=>navigate(`/post/${item.id}`)}>
           <div className='absolute group transition-all duration-200 bg-transparent hover:bg-slate-950 hover:bg-opacity-75 top-0 bottom-0 left-0 right-0 w-full h-full '>
             <div className='flex flex-col justify-center items-center w-full h-full'>
               <HeartIcon className='hidden group-hover:block fill-white' />
@@ -122,7 +122,7 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
                   <div className='mb-4'>{userInfo.userBio}</div>
                   {user?.uid === userId && (
                     <div>
-                      <Button onClick={editProfile}>
+                      <Button className='bg-gradient-to-r from-purple-400 to-pink-600 text-white' onClick={editProfile}>
                         <Edit2Icon className='mr-2 h-4 w-4' />Edit Profile
                       </Button>
                     </div>

@@ -36,30 +36,35 @@ const CreatePost: React.FunctionComponent<ICreatePostProps> = (props) => {
 
  const handleSubmit = async (e:React.MouseEvent<HTMLFormElement>)=>{
     e.preventDefault();
-    console.log("file entry", fileEntry);
-    console.log("post", post);
-    const photoMeta: PhotoMeta[] = fileEntry.files.map((file)=>{
-      return {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const photoMeta: PhotoMeta[] = fileEntry.files.map((file) => ({
         cdnUrl: file.cdnUrl,
         uuid: file.uuid,
-      }
-    })
+      }));
 
-    if(user != null){
-      const newPost:Post = {
-        ...post,
-        userId: user?.uid || null,
-        photos : photoMeta,
-        username: user?.displayName!,
-        photoUrl: user?.photoURL!, 
-      }
+      const newPost: Post = {
+        caption: post.caption,
+        photos: photoMeta,
+        likes: 0,
+        userlikes: [],
+        userId: user.uid,
+        username: user.displayName || "Guest_User",
+        photoUrl: user.photoURL || "",
+        date: new Date()
+      };
 
-      console.log("Final Post " , newPost)
+      // Wait for the post to be created and get the reference
       await createPost(newPost);
+      
+      // Navigate after successful creation
       navigate('/');
-    }
-    else {
-      navigate('/login');
+    } catch (error) {
+      console.error("Error creating post:", error);
     }
  }
 
@@ -91,7 +96,7 @@ const CreatePost: React.FunctionComponent<ICreatePostProps> = (props) => {
                       <Label className='mb-4' htmlFor='photo'>Photos</Label>
                       <FileUploader fileEntry={fileEntry} onChange={setFileEntry} preview={true}/>
                     </div>
-                    <Button className='mt-8 w-32' type='submit'>Post</Button>
+                    <Button className='bg-gradient-to-r from-purple-400 to-pink-600 text-white mt-8 w-32' type='submit'>Post</Button>
                   </form>
                 </div>
               </Card>

@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import PageTransition from '@/components/PageTransition';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
 
 interface IMyPhotosProps {
 
@@ -15,6 +16,7 @@ interface IMyPhotosProps {
 
 const MyPhotos: React.FunctionComponent<IMyPhotosProps> = (props) => {
   const {user} = useUserAuth();
+  const navigate = useNavigate();
   const [data,setData] = React.useState<DocumentResponse[]>([]);
 
   const getAllPost = async (id:string) => {
@@ -36,7 +38,7 @@ const MyPhotos: React.FunctionComponent<IMyPhotosProps> = (props) => {
 
   const renderPost = () => {
     return data.map((item) => {
-      return <div key={item.photos[0].uuid} className='relative'>
+      return <div key={item.photos[0].uuid} className='relative cursor-pointer' onClick={()=>navigate(`/post/${item.id}`)}>
           <div className='absolute group transition-all duration-200 bg-transparent hover:bg-slate-950 hover:bg-opacity-75 top-0 bottom-0 left-0 right-0 w-full h-full'>
             <div className='flex flex-col justify-center items-center w-full h-full'>
               <HeartIcon className='hidden group-hover:block fill-white'/>

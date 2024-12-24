@@ -105,3 +105,24 @@ export interface NotificationBadge {
   lastMessage: string;
   timestamp: number;
 }
+
+export enum NotificationType {
+    LIKE = 'LIKE',
+    COMMENT = 'COMMENT',
+    FOLLOW = 'FOLLOW',
+    UNFOLLOW = 'UNFOLLOW',
+    NEW_POST = 'NEW_POST'
+}
+
+export interface Notification {
+    id?: string;
+    type: NotificationType;
+    senderId: string;
+    receiverId: string;
+    postId?: string;
+    senderName: string;
+    senderPhoto: string;
+    message: string;
+    read: boolean;
+    timestamp: number;
+}
