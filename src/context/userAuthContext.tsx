@@ -21,16 +21,22 @@ const logIn = (email: string, password: string) => {
     return signInWithEmailAndPassword(auth, email, password);
 }
 
-const signUp = async (email: string, password: string) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-
-    await createUserProfile({
+const createInitialUserProfile = async (user: User) => {
+    return createUserProfile({
         userId: user.uid,
         displayName: user.displayName || "",
         photoUrl: user.photoURL || "",
-        userBio: "Please update your bio"
+        userBio: "Please update your bio",
+        followers: [],
+        following: [],
+        bookmarks: [] 
     });
+};
+
+const signUp = async (email: string, password: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    await createInitialUserProfile(user);
     return userCredential;
 }
 
@@ -41,16 +47,8 @@ const logOut = () => {
 const googleSignIn = async () => {
     const googleAuthProvider = new GoogleAuthProvider();
     const userCredential = await signInWithPopup(auth, googleAuthProvider);
-    console.log("User Credential: ", userCredential);
-    
     const user = userCredential.user;
-
-    await createUserProfile({
-        userId: user.uid,
-        displayName: user.displayName || "",
-        photoUrl: user.photoURL || "",
-        userBio: "Please update your bio"
-    });
+    await createInitialUserProfile(user);
     return userCredential;
 }
 

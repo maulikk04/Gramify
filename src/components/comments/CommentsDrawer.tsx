@@ -42,7 +42,7 @@ const CommentsDrawer = ({
                                 alt={post.username}
                             />
                             <div className="text-gray-800">
-                                <Link to={`profile/${post.userId}`} className="font-semibold mr-2">{post.username}</Link>
+                                <Link to={`/profile/${post.userId}`} className="font-semibold mr-2">{post.username}</Link>
                                 <span className="text-gray-600">{post.caption}</span>
                             </div>
                         </div>
@@ -56,7 +56,7 @@ const CommentsDrawer = ({
                                         alt={comment.username}
                                     />
                                     <div className="text-gray-800">
-                                        <Link to={`profile/${comment.userId}`} className="font-semibold mr-2">{comment.username}</Link>
+                                        <Link to={`/profile/${comment.userId}`} className="font-semibold mr-2">{comment.username}</Link>
                                         <span className="text-gray-600">{comment.text}</span>
                                     </div>
                                 </div>

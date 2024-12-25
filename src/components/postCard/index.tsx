@@ -2,7 +2,7 @@ import { useUserAuth } from '@/context/userAuthContext';
 import { CommentResponse, DocumentResponse } from '@/types';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card';
-import { HeartIcon, MessageCircle } from 'lucide-react';
+import { HeartIcon, MessageCircle, BookmarkIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { updateLikesOnPost } from '@/repository/post.service';
 import { motion } from 'framer-motion';
@@ -11,6 +11,7 @@ import CommentsDrawer from '../comments/CommentsDrawer';
 import { Button } from '../ui/button';
 import { useNavigate } from 'react-router-dom';
 import { followUser, unfollowUser, getUserProfile } from '@/repository/user.service';
+import { toggleBookmark, isPostBookmarked } from '@/repository/bookmark.service';
 
 interface IPostCardProps{
     data: DocumentResponse;
@@ -28,6 +29,7 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
     }>({ likes:data.likes, 
         isLike: user?.uid ? data.userlikes.includes(user.uid) : false});
     const [isFollowed, setIsFollowed] = useState(false);
+    const [isBookmarked, setIsBookmarked] = useState(false);
 
     useEffect(() => {
         const checkFollowStatus = async () => {
@@ -42,6 +44,16 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
         };
         checkFollowStatus();
     }, [user?.uid, data.userId]);
+
+    useEffect(() => {
+        const checkBookmarkStatus = async () => {
+            if (user?.uid) {
+                const bookmarked = await isPostBookmarked(user.uid, data.id);
+                setIsBookmarked(bookmarked);
+            }
+        };
+        checkBookmarkStatus();
+    }, [user?.uid, data.id]);
 
     const handleFollowToggle = async () => {
         if (!user?.uid || !data.userId) return;
@@ -60,6 +72,12 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
         } catch (error) {
             console.error("Error toggling follow:", error);
         }
+    };
+
+    const handleBookmark = async () => {
+        if (!user?.uid) return;
+        await toggleBookmark(user.uid, data.id, isBookmarked);
+        setIsBookmarked(!isBookmarked);
     };
 
     const updateLike = async (isVal: boolean) => {
@@ -171,6 +189,10 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
                             onClick={handleOpenComments}
                         />
                     </div>
+                    <BookmarkIcon 
+                        className={cn("cursor-pointer", isBookmarked ? "fill-purple-500" : "fill-none")}
+                        onClick={handleBookmark}
+                    />
                 </div>
                 <div className='w-full text-sm font-semibold'>{likesInfo.likes} likes</div>
                 <div className='w-full text-sm'>

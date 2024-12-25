@@ -15,6 +15,7 @@ import DirectMessages from "./pages/direct";
 import NotificationsPage from "./pages/notifications";
 import SinglePost from "./pages/post/[id]"; 
 import Users from "./pages/users";
+import Settings from "./pages/settings";
 
 export const router = createBrowserRouter([
     {
@@ -83,6 +84,11 @@ export const router = createBrowserRouter([
             {
                 path: "/users",
                 element: <Users />,
+                errorElement: <Error />,
+            },
+            {
+                path: "/settings",
+                element: <Settings />,
                 errorElement: <Error />,
             }
         ]

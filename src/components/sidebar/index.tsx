@@ -79,7 +79,7 @@ const Sidebar: React.FunctionComponent<ISidebarProps> = (props) => {
     },
     {
       name: "Settings",
-      link: "#",
+      link: "/settings",
       icon: settingIcon
     }
   ]
