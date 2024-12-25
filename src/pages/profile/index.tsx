@@ -12,6 +12,7 @@ import PageTransition from '@/components/PageTransition';
 import { motion } from 'framer-motion';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { getBookmarkedPosts } from '@/repository/bookmark.service';
 
 interface IProfileProps {}
 
@@ -31,6 +32,8 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
   };
   const [userInfo, setUserInfo] = React.useState<ProfileResponse>(initialUserInfo);
   const isFollowing = userInfo.followers?.includes(user?.uid || '');
+  const [activeTab, setActiveTab] = React.useState<'posts' | 'bookmarks'>('posts');
+  const [bookmarkedPosts, setBookmarkedPosts] = React.useState<DocumentResponse[]>([]);
 
   const getAllPost = async (id: string) => {
     const posts = await getPostsByUserId(id);
@@ -54,6 +57,13 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
     getUserProfileInfo(userId);
   };
 
+  const fetchBookmarkedPosts = async () => {
+    if (user?.uid) {
+      const posts = await getBookmarkedPosts(user.uid);
+      setBookmarkedPosts(posts);
+    }
+  };
+
   React.useEffect(() => {
     if (userId) {
       getAllPost(userId);
@@ -61,8 +71,30 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
     }
   }, [userId]);
 
+  React.useEffect(() => {
+    if (activeTab === 'bookmarks') {
+      fetchBookmarkedPosts();
+    }
+  }, [activeTab]);
+
   const renderPost = () => {
     return data.map((item) => {
+      return (
+        <div key={item.id} className='relative cursor-pointer' onClick={()=>navigate(`/post/${item.id}`)}>
+          <div className='absolute group transition-all duration-200 bg-transparent hover:bg-slate-950 hover:bg-opacity-75 top-0 bottom-0 left-0 right-0 w-full h-full '>
+            <div className='flex flex-col justify-center items-center w-full h-full'>
+              <HeartIcon className='hidden group-hover:block fill-white' />
+              <div className='hidden group-hover:block text-white'>{item.likes} likes</div>
+            </div>
+          </div>
+          <img src={`${item.photos[0].cdnUrl}/-/format/auto/-/quality/smart/-/resize/300x300/`} />
+        </div>
+      );
+    });
+  };
+
+  const renderBookmarkedPosts = () => {
+    return bookmarkedPosts.map((item) => {
       return (
         <div key={item.id} className='relative cursor-pointer' onClick={()=>navigate(`/post/${item.id}`)}>
           <div className='absolute group transition-all duration-200 bg-transparent hover:bg-slate-950 hover:bg-opacity-75 top-0 bottom-0 left-0 right-0 w-full h-full '>
@@ -134,9 +166,23 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
                   )}
                 </div>
                 <div className='p-8'>
-                  <h2 className='mb-5'>My Posts</h2>
+                  <div className="flex gap-4 mb-6">
+                    <Button 
+                      variant={activeTab === 'posts' ? 'default' : 'outline'}
+                      onClick={() => setActiveTab('posts')}
+                    >
+                      Posts
+                    </Button>
+                    {user?.uid === userId && (
+                    <Button 
+                      variant={activeTab === 'bookmarks' ? 'default' : 'outline'}
+                      onClick={() => setActiveTab('bookmarks')}
+                    >
+                      Bookmarks
+                    </Button> )}
+                  </div>
                   <div className='grid grid-cols-2 md:grid-cols-3 gap-2'>
-                    {data ? renderPost() : <div>...Loading</div>}
+                    {activeTab === 'posts' ? renderPost() : renderBookmarkedPosts()}
                   </div>
                 </div>
               </Card>

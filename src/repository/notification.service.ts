@@ -1,5 +1,5 @@
 import { db } from "@/firebaseConfig";
-import { Notification } from "@/types";
+import { Notification, NotificationType } from "@/types";
 import { 
     collection, 
     addDoc, 
@@ -11,16 +11,42 @@ import {
     doc,
     onSnapshot 
 } from "firebase/firestore";
+import { getUserProfile } from './user.service';
+
 
 const NOTIFICATIONS = "notifications";
 
 export const createNotification = async (notification: Omit<Notification, 'id' | 'read' | 'timestamp'>) => {
     try {
-        await addDoc(collection(db, NOTIFICATIONS), {
-            ...notification,
-            read: false,
-            timestamp: Date.now()
-        });
+        const userProfile = await getUserProfile(notification.receiverId);
+        if (!userProfile?.notificationSettings) return;
+        
+        const { notificationSettings } = userProfile;
+        
+        let shouldSend = false;
+        switch (notification.type) {
+            case NotificationType.LIKE:
+                shouldSend = notificationSettings.likes;
+                break;
+            case NotificationType.COMMENT:
+                shouldSend = notificationSettings.comments;
+                break;
+            case NotificationType.FOLLOW:
+            case NotificationType.UNFOLLOW:
+                shouldSend = notificationSettings.follows;
+                break;
+            case NotificationType.NEW_POST:
+                shouldSend = notificationSettings.newPosts;
+                break;
+        }
+
+        if (shouldSend) {
+            await addDoc(collection(db, NOTIFICATIONS), {
+                ...notification,
+                read: false,
+                timestamp: Date.now()
+            });
+        }
     } catch (error) {
         console.error("Error creating notification:", error);
     }

@@ -49,7 +49,7 @@ export interface DocumentResponse{
     photoUrl:string;
     userId: string|null;
     date:Date;
-
+    bookmarkedBy?: string[];  
 }
 
 export interface ProfileInfo {
@@ -65,6 +65,8 @@ export interface UserProfile {
     userBio: string;
     followers?: string[];
     following?: string[];
+    bookmarks?: string[];  
+    notificationSettings?: NotificationSettings;
 }
 
 export interface ProfileResponse extends UserProfile {
@@ -125,4 +127,11 @@ export interface Notification {
     message: string;
     read: boolean;
     timestamp: number;
+}
+
+export interface NotificationSettings {
+    likes: boolean;
+    comments: boolean;
+    follows: boolean;
+    newPosts: boolean;
 }
