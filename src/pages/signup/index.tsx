@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useUserAuth } from '@/context/userAuthContext';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -119,7 +119,7 @@ const Signup: React.FunctionComponent<ISignupProps> = () => {
                                bg-clip-text text-transparent animate-gradient">
                     Gramify
                   </h1>
-                  <p className="text-sm text-gray-500 mt-2">Join our community today</p>
+                  <p className="text-sm text-gray-500 mt-2">Connect, Share, Inspire</p>
                 </motion.div>
                 <CardDescription>
                   Create your account to get started

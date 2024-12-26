@@ -3,6 +3,8 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../firebaseConfig"
 import { ProfileInfo } from "@/types";
 import { createUserProfile } from "@/repository/user.service";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../firebaseConfig";
 
 interface IUserAuthProviderProps {
     children: React.ReactNode;
@@ -45,12 +47,33 @@ const logOut = () => {
 }
 
 const googleSignIn = async () => {
-    const googleAuthProvider = new GoogleAuthProvider();
-    const userCredential = await signInWithPopup(auth, googleAuthProvider);
-    const user = userCredential.user;
-    await createInitialUserProfile(user);
-    return userCredential;
-}
+    try {
+        const googleAuthProvider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, googleAuthProvider);
+        const user = result.user;
+        
+        const q = query(collection(db, 'users'), where('userId', '==', user.uid));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+            await createUserProfile({
+                userId: user.uid,
+                displayName: user.displayName || "",
+                photoUrl: user.photoURL || "",
+                userBio: "Hello, I'm new here!",
+                followers: [],
+                following: [],
+                isPrivate: false,
+                followRequests: []
+            });
+        }
+        
+        return result;
+    } catch (error) {
+        console.error("Error in Google Sign In:", error);
+        throw error;
+    }
+};
 
 const updateProfileInfo = (profileInfo: ProfileInfo)=>{
     console.log("Profile Info: ", profileInfo);
