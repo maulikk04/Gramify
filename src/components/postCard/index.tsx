@@ -10,7 +10,7 @@ import { createComment, getCommentsByPostId } from '@/repository/comment.service
 import CommentsDrawer from '../comments/CommentsDrawer';
 import { Button } from '../ui/button';
 import { useNavigate } from 'react-router-dom';
-import { followUser, unfollowUser, getUserProfile } from '@/repository/user.service';
+import { followUser, unfollowUser, getUserProfile, sendFollowRequest } from '@/repository/user.service';
 import { toggleBookmark, isPostBookmarked } from '@/repository/bookmark.service';
 
 interface IPostCardProps{
@@ -34,11 +34,10 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
     useEffect(() => {
         const checkFollowStatus = async () => {
             if (user?.uid && data.userId) {
-                const userProfile = await getUserProfile(user.uid);
-                console.log(userProfile);
-                
-                if (userProfile && userProfile.following) {
-                    setIsFollowed(userProfile.following.includes(data.userId));
+                const targetUserProfile = await getUserProfile(data.userId);
+                if (targetUserProfile && targetUserProfile.followers) {
+                    const isUserFollowing = targetUserProfile.followers.includes(user.uid);
+                    setIsFollowed(isUserFollowing);
                 }
             }
         };
@@ -59,8 +58,12 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
         if (!user?.uid || !data.userId) return;
 
         try {
+            const targetUserProfile = await getUserProfile(data.userId);
+            
             if (isFollowed) {
                 await unfollowUser(user.uid, data.userId);
+            } else if (targetUserProfile?.isPrivate) {
+                await sendFollowRequest(user.uid, data.userId);
             } else {
                 await followUser(user.uid, data.userId);
             }

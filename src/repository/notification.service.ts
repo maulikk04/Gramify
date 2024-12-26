@@ -19,6 +19,23 @@ const NOTIFICATIONS = "notifications";
 export const createNotification = async (notification: Omit<Notification, 'id' | 'read' | 'timestamp'>) => {
     try {
         const userProfile = await getUserProfile(notification.receiverId);
+        
+        // Always send notifications for follow requests, accepts, and rejects
+        const isFollowAction = [
+            NotificationType.FOLLOW_REQUEST,
+            NotificationType.FOLLOW_ACCEPT,
+            NotificationType.FOLLOW_REJECT
+        ].includes(notification.type);
+
+        if (isFollowAction) {
+            await addDoc(collection(db, NOTIFICATIONS), {
+                ...notification,
+                read: false,
+                timestamp: Date.now()
+            });
+            return;
+        }
+
         if (!userProfile?.notificationSettings) return;
         
         const { notificationSettings } = userProfile;

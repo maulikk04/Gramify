@@ -16,6 +16,7 @@ const Settings = () => {
         follows: true,
         newPosts: true
     });
+    const [isPrivate, setIsPrivate] = useState(false);
     const [userDocId, setUserDocId] = useState<string>("");
 
     useEffect(() => {
@@ -30,6 +31,7 @@ const Settings = () => {
                         follows: true,
                         newPosts: true
                     });
+                    setIsPrivate(profile.isPrivate || false);
                 }
             }
         };
@@ -52,6 +54,18 @@ const Settings = () => {
         }
     };
 
+    const handlePrivacyToggle = async () => {
+        const newIsPrivate = !isPrivate;
+        setIsPrivate(newIsPrivate);
+        try {
+            await updateUserProfile(userDocId, {
+                isPrivate: newIsPrivate
+            } as any);
+        } catch (error) {
+            console.error("Error updating privacy settings:", error);
+        }
+    };
+
     return (
         <Layout>
             <PageTransition>
@@ -60,11 +74,25 @@ const Settings = () => {
                         <CardHeader>
                             <CardTitle className="text-2xl font-satisfy bg-gradient-to-r from-purple-400 to-pink-600 
                                                bg-clip-text text-transparent text-center">
-                                Notification Settings
+                                Settings
                             </CardTitle>
                         </CardHeader>
                         <div className="p-8">
                             <div className="space-y-6">
+                                <div className="flex items-center justify-between mb-8 pb-8 border-b">
+                                    <Label htmlFor="privacy" className="text-base">
+                                        Private Account
+                                        <p className="text-sm text-gray-500">
+                                            Only followers can see your posts when enabled
+                                        </p>
+                                    </Label>
+                                    <Switch
+                                        id="privacy"
+                                        checked={isPrivate}
+                                        onCheckedChange={handlePrivacyToggle}
+                                    />
+                                </div>
+
                                 <div className="flex items-center justify-between">
                                     <Label htmlFor="likes" className="text-base">
                                         Like Notifications

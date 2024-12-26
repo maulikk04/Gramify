@@ -7,11 +7,13 @@ import { formatMessageDate } from "@/utils/dateUtils";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PageTransition from "@/components/PageTransition";
+import { Button } from "@/components/ui/button";
+import { handleFollowRequest as handleFollowRequestService } from "@/repository/user.service"; 
 
 const NotificationsPage = () => {
     const { user } = useUserAuth();
     const [notifications, setNotifications] = useState<Notification[]>([]);
-
+    
     useEffect(() => {
         if (!user) return;
 
@@ -31,6 +33,14 @@ const NotificationsPage = () => {
                     n.id === notification.id ? { ...n, read: true } : n
                 )
             );
+        }
+    };
+
+    const handleFollowRequest = async (notification: Notification, accept: boolean) => {
+        if (!user) return;
+        await handleFollowRequestService(user.uid, notification.senderId, accept);  
+        if (notification.id) {
+            await markNotificationAsRead(notification.id);
         }
     };
 
@@ -62,6 +72,39 @@ const NotificationsPage = () => {
                         created a new post
                     </Link>
                 );
+            case NotificationType.FOLLOW_REQUEST:
+                return (
+                    <div className="flex justify-between items-center w-full">
+                        <span>wants to follow you</span>
+                        {!notification.read && (
+                            <div className="flex gap-2 ml-4">
+                                <Button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleFollowRequest(notification, true);
+                                    }}
+                                    className="px-2 py-1 text-sm"
+                                >
+                                    Accept
+                                </Button>
+                                <Button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleFollowRequest(notification, false);
+                                    }}
+                                    variant="outline"
+                                    className="px-2 py-1 text-sm"
+                                >
+                                    Reject
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                );
+            case NotificationType.FOLLOW_ACCEPT:
+                return "accepted your follow request";
+            case NotificationType.FOLLOW_REJECT:
+                return "rejected your follow request";
         }
     };
 
@@ -84,7 +127,11 @@ const NotificationsPage = () => {
                                     {notifications.map((notification) => (
                                         <div
                                             key={notification.id}
-                                            onClick={() => handleNotificationClick(notification)}
+                                            onClick={() => {
+                                                if (notification.type !== NotificationType.FOLLOW_REQUEST) {
+                                                    handleNotificationClick(notification);
+                                                }
+                                            }}
                                             className={`p-4 rounded-lg border ${
                                                 notification.read ? 'bg-white' : 'bg-blue-50'
                                             }`}
@@ -96,12 +143,14 @@ const NotificationsPage = () => {
                                                     className="w-10 h-10 rounded-full object-cover"
                                                 />
                                                 <div className="flex-1">
-                                                    <p>
+                                                    <div className="flex items-center gap-1">
                                                         <Link to={`/profile/${notification.senderId}`} className="font-semibold">
                                                             {notification.senderName}
-                                                        </Link>{" "}
-                                                        {getNotificationContent(notification)}
-                                                    </p>
+                                                        </Link>
+                                                        <div className="flex-1 ml-2"> 
+                                                            {getNotificationContent(notification)}
+                                                        </div>
+                                                    </div>
                                                     <p className="text-sm text-gray-500">
                                                         {formatMessageDate(notification.timestamp)}
                                                     </p>

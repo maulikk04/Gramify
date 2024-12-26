@@ -18,9 +18,9 @@ const Home: React.FunctionComponent<IHomeProps> = (props) => {
   const {user} = useUserAuth();
   const [data,setData] = React.useState<DocumentResponse[]>([]);
   const getAllPost = React.useCallback(async () => {
-    const response: DocumentResponse[] = await getPosts() || [];
+    const response: DocumentResponse[] = await getPosts(user?.uid) || [];
     setData(response);
-  }, []);
+  }, [user?.uid]);
 
   React.useEffect(() => {
     if (user != null) {

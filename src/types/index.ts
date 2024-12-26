@@ -67,6 +67,8 @@ export interface UserProfile {
     following?: string[];
     bookmarks?: string[];  
     notificationSettings?: NotificationSettings;
+    isPrivate?: boolean; 
+    followRequests?: string[];
 }
 
 export interface ProfileResponse extends UserProfile {
@@ -113,7 +115,10 @@ export enum NotificationType {
     COMMENT = 'COMMENT',
     FOLLOW = 'FOLLOW',
     UNFOLLOW = 'UNFOLLOW',
-    NEW_POST = 'NEW_POST'
+    NEW_POST = 'NEW_POST',
+    FOLLOW_REQUEST = 'FOLLOW_REQUEST',
+    FOLLOW_ACCEPT = 'FOLLOW_ACCEPT',
+    FOLLOW_REJECT = 'FOLLOW_REJECT'
 }
 
 export interface Notification {

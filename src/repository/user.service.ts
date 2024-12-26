@@ -11,41 +11,39 @@ export const createUserProfile = (user: UserProfile) => {
         return addDoc(collection(db, COLLECTION_NAME), {
             ...user,
             followers: [],
-            following: []
+            following: [],
+            followRequests: [],
+            isPrivate: false
         });
     } catch (error) {
         console.log(error);
     }
 }
 
-export const getUserProfile = async (userId:string) =>{
+export const getUserProfile = async (userId: string) => {
     try {
         const q = query(collection(db, COLLECTION_NAME), where("userId", "==", userId));
         const querySnapshot = await getDocs(q);
-        let tempData: ProfileResponse = {
-            id:"",
-            userId:"",
-            displayName:"",
-            photoUrl:"",
-            userBio:""
-        };
+        
         if (querySnapshot.size > 0) {
-            querySnapshot.forEach((doc) => {
-                const userData = doc.data() as UserProfile;
-                tempData = {
-                    id:doc.id,
-                    ...userData
-                }
-            })
-            return tempData
-        } else {
-            console.log("No such document");
-            return null;
+            const doc = querySnapshot.docs[0];
+            const userData = doc.data() as UserProfile;
+            console.log("Retrieved user profile:", {
+                id: doc.id,
+                ...userData
+            });
+            return {
+                id: doc.id,
+                ...userData
+            } as ProfileResponse;
         }
+        console.log("No user profile found for:", userId);
+        return null;
     } catch (error) {
-        console.log(error);
+        console.error("Error getting user profile:", error);
+        return null;
     }
-}
+};
 
 export const updateUserProfile = (id:string, user:UserProfile) =>{
     const docRef = doc(db, COLLECTION_NAME, id);
@@ -106,15 +104,15 @@ export const followUser = async (currentUserId: string, targetUserId: string) =>
         const currentUserRef = doc(db, COLLECTION_NAME, currentUserDocId);
         const targetUserRef = doc(db, COLLECTION_NAME, targetUserDocId);
 
-        await updateDoc(currentUserRef, {
-            following: arrayUnion(targetUserId)
-        });
+        await Promise.all([
+            updateDoc(currentUserRef, {
+                following: arrayUnion(targetUserId)
+            }),
+            updateDoc(targetUserRef, {
+                followers: arrayUnion(currentUserId)
+            })
+        ]);
 
-        await updateDoc(targetUserRef, {
-            followers: arrayUnion(currentUserId)
-        });
-
-        // Add notification
         const currentUser = auth.currentUser;
         if (currentUser) {
             await createNotification({
@@ -126,8 +124,11 @@ export const followUser = async (currentUserId: string, targetUserId: string) =>
                 message: "started following you"
             });
         }
+
+        return true;
     } catch (error) {
         console.error("Error following user:", error);
+        return false;
     }
 };
 
@@ -151,7 +152,6 @@ export const unfollowUser = async (currentUserId: string, targetUserId: string) 
             followers: arrayRemove(currentUserId)
         });
 
-        // Add notification
         const currentUser = auth.currentUser;
         if (currentUser) {
             await createNotification({
@@ -176,5 +176,71 @@ export const isFollowing = async (currentUserId: string, targetUserId: string) =
     } catch (error) {
         console.error("Error checking follow status:", error);
         return false;
+    }
+};
+
+export const sendFollowRequest = async (currentUserId: string, targetUserId: string) => {
+    try {
+        const targetUserDocId = await getUserDocIdByUserId(targetUserId);
+        if (!targetUserDocId) throw new Error("User document not found");
+
+        const targetUserRef = doc(db, COLLECTION_NAME, targetUserDocId);
+        
+        await updateDoc(targetUserRef, {
+            followRequests: arrayUnion(currentUserId)
+        });
+
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+            await createNotification({
+                type: NotificationType.FOLLOW_REQUEST,
+                senderId: currentUserId,
+                receiverId: targetUserId,
+                senderName: currentUser.displayName || "",
+                senderPhoto: currentUser.photoURL || "",
+                message: "wants to follow you"
+            });
+        }
+    } catch (error) {
+        console.error("Error sending follow request:", error);
+    }
+};
+
+export const handleFollowRequest = async (currentUserId: string, requesterId: string, accept: boolean) => {
+    try {
+        const currentUserDocId = await getUserDocIdByUserId(currentUserId);
+        const requesterDocId = await getUserDocIdByUserId(requesterId);
+
+        if (!currentUserDocId || !requesterDocId) throw new Error("User document not found");
+
+        const currentUserRef = doc(db, COLLECTION_NAME, currentUserDocId);
+        const requesterRef = doc(db, COLLECTION_NAME, requesterDocId);
+
+        await updateDoc(currentUserRef, {
+            followRequests: arrayRemove(requesterId)
+        });
+
+        if (accept) {
+            await updateDoc(currentUserRef, {
+                followers: arrayUnion(requesterId)
+            });
+            await updateDoc(requesterRef, {
+                following: arrayUnion(currentUserId)
+            });
+        }
+
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+            await createNotification({
+                type: accept ? NotificationType.FOLLOW_ACCEPT : NotificationType.FOLLOW_REJECT,
+                senderId: currentUserId,
+                receiverId: requesterId,
+                senderName: currentUser.displayName || "",
+                senderPhoto: currentUser.photoURL || "",
+                message: accept ? "accepted your follow request" : "rejected your follow request"
+            });
+        }
+    } catch (error) {
+        console.error("Error handling follow request:", error);
     }
 };

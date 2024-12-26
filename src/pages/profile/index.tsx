@@ -1,13 +1,13 @@
 import Layout from '@/components/layout';
 import { useUserAuth } from '@/context/userAuthContext';
-import { DocumentResponse, Post, ProfileResponse } from '@/types';
+import { DocumentResponse,ProfileResponse } from '@/types';
 import * as React from 'react';
 import image1 from "@/assets/images/image1.png";
 import { Button } from '@/components/ui/button';
 import { Edit2Icon, HeartIcon } from 'lucide-react';
 import { getPostsByUserId } from '@/repository/post.service';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getUserProfile, followUser, unfollowUser } from '@/repository/user.service';
+import { getUserProfile, followUser, unfollowUser, sendFollowRequest } from '@/repository/user.service';
 import PageTransition from '@/components/PageTransition';
 import { motion } from 'framer-motion';
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -28,12 +28,17 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
     photoUrl: user?.photoURL ? user.photoURL : "",
     displayName: user?.displayName ? user.displayName : "Guest_User",
     followers: [],
-    following: []
+    following: [],
+    followRequests: [], 
+    isPrivate: false
   };
   const [userInfo, setUserInfo] = React.useState<ProfileResponse>(initialUserInfo);
   const isFollowing = userInfo.followers?.includes(user?.uid || '');
+  const isOwnProfile = user?.uid === userId;
+  const canViewPosts = isOwnProfile || !userInfo.isPrivate || isFollowing;
   const [activeTab, setActiveTab] = React.useState<'posts' | 'bookmarks'>('posts');
   const [bookmarkedPosts, setBookmarkedPosts] = React.useState<DocumentResponse[]>([]);
+  const isRequested = userInfo.followRequests?.includes(user?.uid || '') || false;
 
   const getAllPost = async (id: string) => {
     const posts = await getPostsByUserId(id);
@@ -42,6 +47,7 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
 
   const getUserProfileInfo = async (userId: string) => {
     const data: ProfileResponse = (await getUserProfile(userId)) || initialUserInfo;
+    console.log("User Profile Data:", data);
     if (data) {
       setUserInfo(data);
     }
@@ -51,6 +57,8 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
     if (!user || !userId) return;
     if (isFollowing) {
       await unfollowUser(user.uid, userId);
+    } else if (userInfo.isPrivate) {
+      await sendFollowRequest(user.uid, userId);
     } else {
       await followUser(user.uid, userId);
     }
@@ -109,6 +117,16 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
     });
   };
 
+  const renderPrivacyNotice = () => {
+    if (!userInfo.isPrivate || isOwnProfile || isFollowing) return null;
+    return (
+      <div className="text-center p-8">
+        <p className="text-gray-500">This account is private.</p>
+        <p className="text-gray-500">Follow this account to see their posts.</p>
+      </div>
+    );
+  };
+
   const editProfile = () => {
     navigate('/edit-profile', { state: userInfo });
   };
@@ -160,8 +178,13 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
                     </div>
                   )}
                   {user?.uid !== userId && (
-                    <Button onClick={handleFollowClick}>
-                      {isFollowing ? 'Unfollow' : 'Follow'}
+                    <Button 
+                      onClick={handleFollowClick}
+                      disabled={isRequested}
+                    >
+                      {isFollowing ? 'Unfollow' : 
+                      isRequested ? 'Requested' : 
+                      userInfo.isPrivate ? 'Request to Follow' : 'Follow'}
                     </Button>
                   )}
                 </div>
@@ -181,9 +204,11 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
                       Bookmarks
                     </Button> )}
                   </div>
-                  <div className='grid grid-cols-2 md:grid-cols-3 gap-2'>
-                    {activeTab === 'posts' ? renderPost() : renderBookmarkedPosts()}
-                  </div>
+                  {!canViewPosts ? renderPrivacyNotice() : (
+                    <div className='grid grid-cols-2 md:grid-cols-3 gap-2'>
+                      {activeTab === 'posts' ? renderPost() : renderBookmarkedPosts()}
+                    </div>
+                  )}
                 </div>
               </Card>
             </div>
