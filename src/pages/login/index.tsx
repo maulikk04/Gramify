@@ -140,7 +140,7 @@ const Login: React.FunctionComponent<ILoginProps> = () => {
 
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="m@example.com" value={userLogInInfo.email}
+                  <Input id="email" type="email" placeholder="Email" value={userLogInInfo.email}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setUserInfo({ ...userLogInInfo, email: e.target.value })
                     }

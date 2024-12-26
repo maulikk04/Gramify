@@ -11,12 +11,13 @@ import { motion } from "framer-motion";
 import PageTransition from '@/components/PageTransition';
 
 interface IHomeProps {
-
 }
 
 const Home: React.FunctionComponent<IHomeProps> = (props) => {
   const {user} = useUserAuth();
-  const [data,setData] = React.useState<DocumentResponse[]>([]);
+  const [data, setData] = React.useState<DocumentResponse[]>([]);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  
   const getAllPost = React.useCallback(async () => {
     const response: DocumentResponse[] = await getPosts(user?.uid) || [];
     setData(response);
@@ -32,17 +33,28 @@ const Home: React.FunctionComponent<IHomeProps> = (props) => {
     if (user) {
       const interval = setInterval(() => {
         getAllPost();
-      }, 10000); // Refresh every 10 seconds
+      }, 10000);
 
       return () => clearInterval(interval);
     }
   }, [user, getAllPost]);
 
+  const filteredPosts = React.useMemo(() => {
+    if (!searchQuery.trim()) return data;
+    
+    const query = searchQuery.toLowerCase();
+    return data.filter(post => 
+      post.username.toLowerCase().includes(query) ||
+      post.caption.toLowerCase().includes(query)
+    );
+  }, [data, searchQuery]);
+
   const renderPost = () => {
-    return data.map((item)=>{
+    return filteredPosts.map((item) => {
       return <PostCard data={item} key={item.id}/>
     })
   }
+
   return (
     <Layout>
       <PageTransition>
@@ -58,9 +70,11 @@ const Home: React.FunctionComponent<IHomeProps> = (props) => {
                   className='border border-gray-200 bg-white/80 h-12 pl-12 pr-4 rounded-xl
                             text-base focus:outline-none focus:border-purple-400 transition-all duration-200
                             backdrop-blur-sm shadow-sm hover:shadow-md'
-                  placeholder='Search posts, people & more...'
+                  placeholder='Search posts and users...'
                   type='search'
                   name='search'
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 <Search className='absolute left-4 top-1/2 transform -translate-y-1/2 
                                   w-5 h-5 text-gray-400 group-hover:text-purple-400 transition-colors duration-200'/>
@@ -70,30 +84,19 @@ const Home: React.FunctionComponent<IHomeProps> = (props) => {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className='mb-8 bg-white/90 backdrop-blur-sm rounded-xl p-6 
-                        shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)]
-                        transition-all duration-300'
-            >
-              <h2 className='mb-4 text-2xl font-satisfy bg-gradient-to-r from-purple-400 to-pink-600 
-                            bg-clip-text text-transparent'>Stories</h2>
-              <Stories/>
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
               className='mb-8 space-y-6'
             >
-              <h2 className='mb-6 text-2xl font-satisfy bg-gradient-to-r from-purple-400 to-pink-600 
+              <h2 className='mb-6 text-3xl font-satisfy bg-gradient-to-r from-purple-400 to-pink-600 
                             bg-clip-text text-transparent'>Feed</h2>
               <div className='w-full flex justify-center'>
                 <div className='flex flex-col w-full gap-6'>
-                  {data ? renderPost() : (
+                  {filteredPosts.length > 0 ? renderPost() : (
                     <div className="flex items-center justify-center h-40 bg-white/80 rounded-xl 
                                   backdrop-blur-sm shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)]">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"/>
+                      <p className="text-gray-500">
+                        {data.length === 0 ? "Loading..." : "No posts found"}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -103,7 +106,6 @@ const Home: React.FunctionComponent<IHomeProps> = (props) => {
         </div>
       </PageTransition>
     </Layout>
-
   );
 }
 
