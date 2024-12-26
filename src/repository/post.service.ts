@@ -2,16 +2,15 @@ import { auth, db } from "@/firebaseConfig";
 import { DocumentResponse, NotificationType, Post, ProfileInfo } from "@/types";
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, updateDoc, where } from "firebase/firestore";
 import { createNotification } from './notification.service';
+import { getUserProfile } from './user.service';
 
 const COLLECTION_NAME = "posts";
 
 export const createPost = async (post: Post) => {
     try {
-        // First create the post
         const docRef = await addDoc(collection(db, COLLECTION_NAME), post);
         console.log("Post created with ID:", docRef.id);
 
-        // Get the user's followers
         const userDocRef = query(collection(db, 'users'), where('userId', '==', post.userId));
         const userSnapshot = await getDocs(userDocRef);
         
@@ -46,52 +45,82 @@ export const createPost = async (post: Post) => {
     }
 };
 
-export const getPosts = async () => {
+export const getPosts = async (currentUserId?: string) => {
     try {
         const q = query(collection(db, COLLECTION_NAME), orderBy("date", "desc"));
         const querySnapshot = await getDocs(q);
         const tempArr: DocumentResponse[] = [];
-        if (querySnapshot.size > 0) {
-            querySnapshot.forEach((doc) => {
-                const data = doc.data() as Post;
-                const responseObj: DocumentResponse = {
-                    id:doc.id,
-                    ...data
-                }
-                tempArr.push(responseObj);
-            })
-            return tempArr;
-        } else {
-            console.log("No such document");
-
-        }
-    } catch (error) {
-        console.log(error);
         
-    }
-}
+        if (querySnapshot.size > 0) {
+            const usersQuery = query(collection(db, 'users'));
+            const usersSnapshot = await getDocs(usersQuery);
+            const userPrivacyMap = new Map();
+            
+            usersSnapshot.forEach((doc) => {
+                const userData = doc.data();
+                userPrivacyMap.set(userData.userId, {
+                    isPrivate: userData.isPrivate,
+                    followers: userData.followers || []
+                });
+            });
 
-export const getPostsByUserId = async (userId: string) => {
+            for (const doc of querySnapshot.docs) {
+                const postData = doc.data() as Post;
+                const userPrivacy = userPrivacyMap.get(postData.userId);
+                
+                // Include post if:
+                // 1. Account is not private
+                // 2. It's the current user's post
+                // 3. Current user follows the private account
+                if (!userPrivacy?.isPrivate || 
+                    postData.userId === currentUserId ||
+                    userPrivacy?.followers?.includes(currentUserId)) {
+                    tempArr.push({
+                        id: doc.id,
+                        ...postData
+                    } as DocumentResponse);
+                }
+            }
+            return tempArr;
+        }
+        
+        return [];
+    } catch (error) {
+        console.error("Error getting posts:", error);
+        return [];
+    }
+};
+
+export const getPostsByUserId = async (userId: string, requesterId?: string) => {
     try {
-        const q = query(collection(db, COLLECTION_NAME), where("userId", "==", userId), orderBy("date", "desc"));
+        const userProfile = await getUserProfile(userId);
+        
+        // If profile is private and requester is not a follower, return empty array
+        if (userProfile?.isPrivate && requesterId && requesterId !== userId) {
+            const isFollower = userProfile.followers?.includes(requesterId);
+            if (!isFollower) {
+                return [];
+            }
+        }
+
+        const q = query(collection(db, COLLECTION_NAME), 
+            where("userId", "==", userId),
+            orderBy("date", "desc")
+        );
+        
         const querySnapshot = await getDocs(q);
         const tempArr: DocumentResponse[] = [];
-        if (querySnapshot.size > 0) {
-            querySnapshot.forEach((doc) => {
-                const data = doc.data() as Post;
-                const responseObj: DocumentResponse = {
-                    id: doc.id,
-                    ...data
-                };
-                tempArr.push(responseObj);
-            });
-            return tempArr;
-        } else {
-            console.log("No data found");
-            return [];
-        }
+        
+        querySnapshot.forEach((doc) => {
+            tempArr.push({
+                id: doc.id,
+                ...doc.data()
+            } as DocumentResponse);
+        });
+        
+        return tempArr;
     } catch (error) {
-        console.log(error);
+        console.error("Error getting posts:", error);
         return [];
     }
 };
