@@ -6,7 +6,7 @@ import { UserAuthProvider } from './context/userAuthContext';
 interface IAppProps {
 }
 
-const App: React.FunctionComponent<IAppProps> = (props) => {
+const App: React.FunctionComponent<IAppProps> = () => {
   return(
     <UserAuthProvider>
       <RouterProvider router={router} />

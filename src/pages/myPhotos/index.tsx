@@ -1,7 +1,7 @@
 import Layout from '@/components/layout';
 import { useUserAuth } from '@/context/userAuthContext';
 import { getPostsByUserId } from '@/repository/post.service';
-import { DocumentResponse, Post } from '@/types';
+import { DocumentResponse } from '@/types';
 import * as React from 'react';
 import { HeartIcon} from "lucide-react";
 import { motion } from 'framer-motion';
@@ -14,7 +14,7 @@ interface IMyPhotosProps {
 
 }
 
-const MyPhotos: React.FunctionComponent<IMyPhotosProps> = (props) => {
+const MyPhotos: React.FunctionComponent<IMyPhotosProps> = () => {
   const {user} = useUserAuth();
   const navigate = useNavigate();
   const [data,setData] = React.useState<DocumentResponse[]>([]);

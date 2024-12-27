@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
 import { Icons } from '@/components/ui/icons';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,7 +8,7 @@ import { useUserAuth } from "@/context/userAuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import * as React from 'react';
 import { motion } from "framer-motion";
-
+import AnimatedBackground from '@/components/AnimatedBackground';
 
 interface ILoginProps {
 }
@@ -72,24 +72,7 @@ const Login: React.FunctionComponent<ILoginProps> = () => {
     }
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-blue-950 via-purple-900 to-blue-950">
-      {/* Animated background circles */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(5)].map((_, i) => (
-          <div
-            key={i}
-            className={`absolute rounded-full bg-purple-600/10 animate-pulse`}
-            style={{
-              width: `${Math.random() * 400 + 100}px`,
-              height: `${Math.random() * 400 + 100}px`,
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animation: `float ${Math.random() * 10 + 5}s infinite`,
-              animationDelay: `${Math.random() * 2}s`,
-            }}
-          />
-        ))}
-      </div>
-
+      <AnimatedBackground />
       <div className="container relative mx-auto flex min-h-screen items-center justify-center p-6">
         <div className="w-full max-w-md">
           <Card className="backdrop-blur-sm bg-white/90">

@@ -7,7 +7,7 @@ import { Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/PageTransition';
-
+import image1 from '@/assets/images/image1.png';
 const Users = () => {
     const [users, setUsers] = useState<ProfileResponse[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
@@ -65,7 +65,7 @@ const Users = () => {
                                                  cursor-pointer transition-colors duration-200"
                                     >
                                         <img
-                                            src={user.photoUrl || "/default-avatar.png"}
+                                            src={user.photoUrl || image1}
                                             alt={user.displayName}
                                             className="w-12 h-12 rounded-full object-cover"
                                         />

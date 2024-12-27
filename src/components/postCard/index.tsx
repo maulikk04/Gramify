@@ -12,7 +12,7 @@ import { Button } from '../ui/button';
 import { useNavigate } from 'react-router-dom';
 import { followUser, unfollowUser, getUserProfile, sendFollowRequest } from '@/repository/user.service';
 import { toggleBookmark, isPostBookmarked } from '@/repository/bookmark.service';
-
+import image1 from '@/assets/images/image1.png'
 interface IPostCardProps{
     data: DocumentResponse;
 }
@@ -149,7 +149,7 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
                 <CardTitle className='text-sm text-center flex justify-between items-center'>
                     <div className='flex items-center'>
                         <span className='mr-2'>
-                            <img src={data.photoUrl} className='w-10 h-10 rounded-full border-2 border-slate-800 object-cover'/>
+                            <img src={data.photoUrl ? data.photoUrl : image1} className='w-10 h-10 rounded-full border-2 border-slate-800 object-cover'/>
                         </span>
                         <span className='cursor-pointer' onClick={(e)=>{
                             e.preventDefault(); 
