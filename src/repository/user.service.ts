@@ -28,16 +28,16 @@ export const getUserProfile = async (userId: string) => {
         if (querySnapshot.size > 0) {
             const doc = querySnapshot.docs[0];
             const userData = doc.data() as UserProfile;
-            console.log("Retrieved user profile:", {
-                id: doc.id,
-                ...userData
-            });
+            // console.log("Retrieved user profile:", {
+            //     id: doc.id,
+            //     ...userData
+            // });
             return {
                 id: doc.id,
                 ...userData
             } as ProfileResponse;
         }
-        console.log("No user profile found for:", userId);
+        //console.log("No user profile found for:", userId);
         return null;
     } catch (error) {
         console.error("Error getting user profile:", error);
@@ -65,7 +65,7 @@ export const getAllUsers = async (userId:string) =>{
                 }
                 tempArr.push(resObj);
             })
-            console.log("temp Arr" , tempArr);
+            //console.log("temp Arr" , tempArr);
             
             return tempArr.filter((item) => item.userId !== userId);
         } else {
@@ -80,7 +80,7 @@ export const getUserDocIdByUserId = async (userId: string) => {
     try {
         const q = query(collection(db, COLLECTION_NAME), where("userId", "==", userId));
         const querySnapshot = await getDocs(q);
-        console.log("querySnapshot", querySnapshot);
+        //console.log("querySnapshot", querySnapshot);
         
         if (!querySnapshot.empty) {
             return querySnapshot.docs[0].id;

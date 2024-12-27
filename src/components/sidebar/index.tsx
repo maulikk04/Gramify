@@ -17,10 +17,10 @@ import { getUnreadMessageCount } from '@/repository/chat.service';
 import { getUnreadNotificationCount } from '@/repository/notification.service';
 
 interface ISidebarProps {
-
+  onClose?: () => void;
 }
 
-const Sidebar: React.FunctionComponent<ISidebarProps> = (props) => {
+const Sidebar: React.FunctionComponent<ISidebarProps> = ({ onClose }) => {
   const { pathname } = useLocation();
   const { logOut, user } = useUserAuth();  
   const [unreadMessages, setUnreadMessages] = useState(0);
@@ -85,12 +85,18 @@ const Sidebar: React.FunctionComponent<ISidebarProps> = (props) => {
   ]
   return (
     <nav className='flex flex-col space-x-2 relative h-screen max-w-sw w-full '>
-      <div className='flex justify-center m-5'>
-      <div className='text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 
+      <div className='flex justify-between items-center m-5 pl-8 lg:pl-0'>
+        <div className='text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 
                        text-3xl font-bold tracking-wider hover:scale-105 transition-transform
                        duration-200 cursor-pointer font-satisfy'>
           Gramify
         </div>
+        <button 
+          onClick={onClose}
+          className="lg:hidden text-white p-2 hover:bg-white/10 rounded-full"
+        >
+          ✕
+        </button>
       </div>
 
       {navItems.map((item) => (

@@ -24,7 +24,7 @@ export const toggleBookmark = async (userId: string, postId: string, isBookmarke
         }
 
         const userRef = doc(db, USERS_COLLECTION, userDocId);
-        console.log("UserRef: ", userRef);
+        //console.log("UserRef: ", userRef);
         
         const postRef = doc(db, POSTS_COLLECTION, postId);
 

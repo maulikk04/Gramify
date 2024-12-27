@@ -1,6 +1,5 @@
 import Layout from '@/components/layout';
 import PostCard from '@/components/postCard';
-import Stories from '@/components/stories';
 import { Input } from '@/components/ui/input';
 import { useUserAuth } from '@/context/userAuthContext';
 import { getPosts } from '@/repository/post.service';
@@ -13,7 +12,7 @@ import PageTransition from '@/components/PageTransition';
 interface IHomeProps {
 }
 
-const Home: React.FunctionComponent<IHomeProps> = (props) => {
+const Home: React.FunctionComponent<IHomeProps> = () => {
   const {user} = useUserAuth();
   const [data, setData] = React.useState<DocumentResponse[]>([]);
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -62,9 +61,9 @@ const Home: React.FunctionComponent<IHomeProps> = (props) => {
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className='flex flex-col max-w-2xl mx-auto space-y-6'
+            className='flex flex-col max-w-2xl mx-auto space-y-6 px-4 sm:px-0'
           >
-            <div className='relative mb-8 w-full'>
+            <div className='relative mb-8 w-full lg:mt-0 mt-10'>
               <div className='relative group'>
                 <Input 
                   className='border border-gray-200 bg-white/80 h-12 pl-12 pr-4 rounded-xl

@@ -170,12 +170,12 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
                 </CardTitle>
                 
             </CardHeader>
-            <CardContent className='p-0 h-[500px]'>
-                <div className="relative w-full h-full">
+            <CardContent className='p-0'>
+                <div className="w-full pb-[100%] relative">
                     <img 
                         src={data.photos? data.photos[0].cdnUrl : ""} 
                         alt={data.caption}
-                        className="absolute inset-0 w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-contain bg-black/5"
                     />
                 </div>
             </CardContent>
