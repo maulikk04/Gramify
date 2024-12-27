@@ -8,6 +8,7 @@ import Layout from "@/components/layout";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search } from "lucide-react"; 
 import { getChatRoom } from '@/repository/chat.service';
+import image1 from '@/assets/images/image1.png';
 
 const DirectMessages = () => {
     const [users, setUsers] = useState<ProfileResponse[]>([]);
@@ -81,7 +82,7 @@ const DirectMessages = () => {
                                         className="flex items-center gap-4 p-4 hover:bg-gray-50 border-b last:border-b-0 relative"
                                     >
                                         <img
-                                            src={user.photoUrl || "/default-avatar.png"}
+                                            src={user.photoUrl || image1}
                                             alt={user.displayName}
                                             className="w-12 h-12 rounded-full object-cover"
                                         />

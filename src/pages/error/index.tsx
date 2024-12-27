@@ -4,7 +4,7 @@ interface IErrorProps {
 
 }
 
-const Error: React.FunctionComponent<IErrorProps> = (props) => {
+const Error: React.FunctionComponent<IErrorProps> = () => {
   return (
     <div>
       Error
