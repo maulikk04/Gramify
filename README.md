@@ -25,7 +25,7 @@ A modern social media platform built with React, TypeScript, and Firebase.
   - New posts from following
   - Follow requests
 
-## Tech Stack 🛠️
+## Tech Stack 🚀
 
 ### Frontend
 - [React](https://reactjs.org/) - UI library
@@ -37,7 +37,7 @@ A modern social media platform built with React, TypeScript, and Firebase.
 - [Firebase](https://firebase.google.com/) - Backend services
 - [Uploadcare](https://uploadcare.com/) - Media handling
 
-## Setup 🚀
+## Setup 🛠️
 
 1. Clone the repository:
 ```bash
