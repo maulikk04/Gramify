@@ -119,7 +119,7 @@ const NotificationsPage = () => {
                                 Notifications
                             </CardTitle>
                         </CardHeader>
-                        <div className="p-8">
+                        <div className="p-4 sm:p-8">
                             {notifications.length === 0 ? (
                                 <p className="text-center text-gray-500">No notifications yet</p>
                             ) : (
@@ -132,22 +132,23 @@ const NotificationsPage = () => {
                                                     handleNotificationClick(notification);
                                                 }
                                             }}
-                                            className={`p-4 rounded-lg border ${
+                                            className={`p-3 sm:p-4 rounded-lg border ${
                                                 notification.read ? 'bg-white' : 'bg-blue-50'
                                             }`}
                                         >
-                                            <div className="flex items-center gap-3">
+                                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                                                 <img
                                                     src={notification.senderPhoto}
                                                     alt={notification.senderName}
                                                     className="w-10 h-10 rounded-full object-cover"
                                                 />
                                                 <div className="flex-1">
-                                                    <div className="flex items-center gap-1">
-                                                        <Link to={`/profile/${notification.senderId}`} className="font-semibold">
+                                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1">
+                                                        <Link to={`/profile/${notification.senderId}`} 
+                                                              className="font-semibold">
                                                             {notification.senderName}
                                                         </Link>
-                                                        <div className="flex-1 ml-2"> 
+                                                        <div className="flex-1"> 
                                                             {getNotificationContent(notification)}
                                                         </div>
                                                     </div>

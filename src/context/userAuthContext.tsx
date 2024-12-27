@@ -76,7 +76,7 @@ const googleSignIn = async () => {
 };
 
 const updateProfileInfo = (profileInfo: ProfileInfo)=>{
-    console.log("Profile Info: ", profileInfo);
+    //console.log("Profile Info: ", profileInfo);
     return updateProfile(profileInfo.user , {
         displayName: profileInfo.displayName,
         photoURL: profileInfo.photoUrl
@@ -98,7 +98,7 @@ export const UserAuthProvider: React.FunctionComponent<IUserAuthProviderProps> =
     useEffect(()=>{
         const unsubscribe = onAuthStateChanged(auth, (user)=>{
             if(user){
-                console.log("The logged in user state is: " , user);
+                //console.log("The logged in user state is: " , user);
                 setUser(user);
             }
 

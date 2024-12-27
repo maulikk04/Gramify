@@ -9,7 +9,7 @@ const COLLECTION_NAME = "posts";
 export const createPost = async (post: Post) => {
     try {
         const docRef = await addDoc(collection(db, COLLECTION_NAME), post);
-        console.log("Post created with ID:", docRef.id);
+        //console.log("Post created with ID:", docRef.id);
 
         const userDocRef = query(collection(db, 'users'), where('userId', '==', post.userId));
         const userSnapshot = await getDocs(userDocRef);
@@ -17,7 +17,7 @@ export const createPost = async (post: Post) => {
         if (!userSnapshot.empty) {
             const userData = userSnapshot.docs[0].data();
             const followers = userData.followers || [];
-            console.log("Found followers:", followers);
+            //console.log("Found followers:", followers);
 
             // Send notifications to all followers
             for (const followerId of followers) {
@@ -31,7 +31,7 @@ export const createPost = async (post: Post) => {
                         senderPhoto: post.photoUrl,
                         message: "created a new post"
                     });
-                    console.log("Notification sent to follower:", followerId);
+                    //console.log("Notification sent to follower:", followerId);
                 } catch (notifError) {
                     console.error("Error sending notification to follower:", followerId, notifError);
                 }

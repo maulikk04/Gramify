@@ -18,12 +18,12 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface IEditProfileProps { }
 
-const EditProfile: React.FC<IEditProfileProps> = (props) => {
+const EditProfile: React.FC<IEditProfileProps> = () => {
     const { user, updateProfileInfo } = useUserAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const { id, userId, userBio, displayName, photoUrl } = location.state;
-    console.log("loc state ", location.state);
+    //console.log("loc state ", location.state);
 
     const [data, setData] = React.useState<UserProfile>({
         userId,
@@ -38,12 +38,12 @@ const EditProfile: React.FC<IEditProfileProps> = (props) => {
         e.preventDefault();
         try {
             if (id) {
-                const response = await updateUserProfile(id, data);
-                console.log("updated user profile", response);
+                await updateUserProfile(id, data);
+                //console.log("updated user profile", response);
 
             } else {
-                const response = await createUserProfile(data);
-                console.log("created user profile", response);
+                await createUserProfile(data);
+                //console.log("created user profile", response);
 
             }
             const profileInfo: ProfileInfo = {

@@ -16,7 +16,7 @@ import { getBookmarkedPosts } from '@/repository/bookmark.service';
 
 interface IProfileProps {}
 
-const Profile: React.FunctionComponent<IProfileProps> = (props) => {
+const Profile: React.FunctionComponent<IProfileProps> = () => {
   const { user } = useUserAuth();
   const { userId } = useParams<{ userId: string }>();
   const [data, setData] = React.useState<DocumentResponse[]>([]);
@@ -47,7 +47,7 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
 
   const getUserProfileInfo = async (userId: string) => {
     const data: ProfileResponse = (await getUserProfile(userId)) || initialUserInfo;
-    console.log("User Profile Data:", data);
+   // console.log("User Profile Data:", data);
     if (data) {
       setUserInfo(data);
     }
@@ -137,24 +137,26 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
         <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
           <AnimatedBackground />
           <motion.div 
-            className='container mx-auto px-4 py-8'
+            className='container mx-auto px-2 sm:px-4 py-4 sm:py-8' 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <div className='max-w-3xl mx-auto'>
               <Card className="overflow-hidden backdrop-blur-sm bg-white/90">
                 <CardHeader>
-                  <CardTitle className="text-2xl font-satisfy bg-gradient-to-r from-purple-400 to-pink-600 
+                  <CardTitle className="text-xl sm:text-2xl font-satisfy bg-gradient-to-r from-purple-400 to-pink-600 
                                       bg-clip-text text-transparent text-center">
                     Profile
                   </CardTitle>
                 </CardHeader>
-                <div className='p-8 pb-4  border-b'>
-                  <div className='flex felx-row items-center pb-2 mb-2'>
-                    <div className='mr-2'>
-                      <img src={userInfo.photoUrl ? userInfo.photoUrl : image1} alt="avatar" className='w-28 h-28 rounded-full border=2 border-slate-800 object-cover'></img>
+                <div className='p-4 sm:p-8 pb-4 border-b'>
+                  <div className='flex flex-col sm:flex-row items-center pb-2 mb-2'>
+                    <div className='mb-4 sm:mb-0 sm:mr-2'>
+                      <img src={userInfo.photoUrl ? userInfo.photoUrl : image1} 
+                           alt="avatar" 
+                           className='w-20 h-20 sm:w-28 sm:h-28 rounded-full border-2 border-slate-800 object-cover' />
                     </div>
-                    <div>
+                    <div className='text-center sm:text-left'>
                       <div className='text-xl ml-3'>{userInfo.displayName ? userInfo.displayName : "Guest_User"}</div>
                       {user?.uid === userId && (
                         <div className='text-xl ml-3'>{user?.email ? user.email : ""}</div>
@@ -188,7 +190,7 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
                     </Button>
                   )}
                 </div>
-                <div className='p-8'>
+                <div className='p-4 sm:p-8'>
                   <div className="flex gap-4 mb-6">
                     <Button 
                       variant={activeTab === 'posts' ? 'default' : 'outline'}
@@ -205,7 +207,7 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
                     </Button> )}
                   </div>
                   {!canViewPosts ? renderPrivacyNotice() : (
-                    <div className='grid grid-cols-2 md:grid-cols-3 gap-2'>
+                    <div className='grid grid-cols-2 sm:grid-cols-3 gap-1 sm:gap-2'>
                       {activeTab === 'posts' ? renderPost() : renderBookmarkedPosts()}
                     </div>
                   )}

@@ -36,6 +36,7 @@ const FileUploader: React.FC<IFileUploaderProps> = ({ fileEntry, onChange, previ
                 className="uc-light"
                 pubkey={import.meta.env.VITE_UPLOADCAREKEY}
                 multiple={false}
+                accept="image/*"
             />
             {preview && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
