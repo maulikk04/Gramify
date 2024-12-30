@@ -16,6 +16,7 @@ import NotificationsPage from "./pages/notifications";
 import SinglePost from "./pages/post/[id]"; 
 import Users from "./pages/users";
 import Settings from "./pages/settings";
+import ForgotPassword from "./pages/forgot-password";
 
 export const router = createBrowserRouter([
     {
@@ -101,6 +102,11 @@ export const router = createBrowserRouter([
     {
         path: "/signup",
         element: <Signup />,
+        errorElement: <Error />,
+    },
+    {
+        path: "/forgot-password",
+        element: <ForgotPassword />,
         errorElement: <Error />,
     }
 ]);

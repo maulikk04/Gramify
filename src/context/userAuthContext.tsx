@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile, User } from "firebase/auth";
+import { createUserWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile, User } from "firebase/auth";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../firebaseConfig"
 import { ProfileInfo } from "@/types";
@@ -16,11 +16,18 @@ type AuthContextData = {
     signUp: typeof signUp;
     logOut: typeof logOut;
     googleSignIn: typeof googleSignIn;
-    updateProfileInfo: typeof updateProfileInfo
+    updateProfileInfo: typeof updateProfileInfo;
+    sendVerificationEmail: typeof sendVerificationEmail;
+    resetPassword: typeof resetPassword;
 }
 
-const logIn = (email: string, password: string) => {
-    return signInWithEmailAndPassword(auth, email, password);
+const logIn = async (email: string, password: string) => {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    if (!user.emailVerified) {
+        throw new Error("Please verify your email before logging in");
+    }
+    return userCredential;
 }
 
 const createInitialUserProfile = async (user: User) => {
@@ -35,10 +42,19 @@ const createInitialUserProfile = async (user: User) => {
     });
 };
 
+const sendVerificationEmail = (user: User) => {
+    return sendEmailVerification(user);
+};
+
+const resetPassword = (email: string) => {
+    return sendPasswordResetEmail(auth, email);
+};
+
 const signUp = async (email: string, password: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     await createInitialUserProfile(user);
+    await sendVerificationEmail(user);
     return userCredential;
 }
 
@@ -90,7 +106,9 @@ export const userAuthContext = createContext<AuthContextData>({
     signUp,
     logOut,
     googleSignIn,
-    updateProfileInfo 
+    updateProfileInfo,
+    sendVerificationEmail,
+    resetPassword
 })
 
 export const UserAuthProvider: React.FunctionComponent<IUserAuthProviderProps> = ({ children }) => {
@@ -114,7 +132,9 @@ export const UserAuthProvider: React.FunctionComponent<IUserAuthProviderProps> =
         signUp,
         logOut,
         googleSignIn,
-        updateProfileInfo
+        updateProfileInfo,
+        sendVerificationEmail,
+        resetPassword
     }
     return <userAuthContext.Provider value={value}>
         {children}
