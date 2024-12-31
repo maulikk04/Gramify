@@ -1,11 +1,10 @@
 # Gramify 📱
-
 A modern social media platform built with React, TypeScript, and Firebase.
 
 ## Features ✨
-
 ### Authentication & Profile
-- 🔐 User login/signup
+- 🔐 User login/signup with email verification
+- 🔑 Forgot password and reset functionality
 - 👤 Customizable profile page
 - 🔄 Profile updates
 - 🔒 Private profile option
@@ -25,8 +24,12 @@ A modern social media platform built with React, TypeScript, and Firebase.
   - New posts from following
   - Follow requests
 
-## Tech Stack 🚀
+### Security Features
+- ✉️ Email verification required after signup
+- 🔐 Secure password reset process via email
+- 🛡️ Protected routes for verified users only
 
+## Tech Stack 🚀
 ### Frontend
 - [React](https://reactjs.org/) - UI library
 - [TypeScript](https://www.typescriptlang.org/) - Type safety
@@ -38,7 +41,6 @@ A modern social media platform built with React, TypeScript, and Firebase.
 - [Uploadcare](https://uploadcare.com/) - Media handling
 
 ## Setup 🛠️
-
 1. Clone the repository:
 ```bash
 git init
@@ -70,5 +72,4 @@ npm run dev
 ```
 
 ## Demo 🎥
-
-[Watch Demo Video](https://drive.google.com/file/d/1z3ADBemErUcOI-XKTi36yNIiDOhCn6zg/view?usp=drive_link)
+[Watch Demo Video](https://drive.google.com/file/d/17njtWCZ9abTkSddMo_Q6p6bMAsE-Zb1C/view?usp=sharing)
