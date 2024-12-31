@@ -22,14 +22,15 @@ const EditProfile: React.FC<IEditProfileProps> = () => {
     const { user, updateProfileInfo } = useUserAuth();
     const location = useLocation();
     const navigate = useNavigate();
-    const { id, userId, userBio, displayName, photoUrl } = location.state;
+    const { id, userId, userBio, displayName, photoUrl,email } = location.state;
     //console.log("loc state ", location.state);
 
     const [data, setData] = React.useState<UserProfile>({
         userId,
         userBio,
         displayName,
-        photoUrl
+        photoUrl,
+        email
     })
     const [fileEntry, setFileEntry] = React.useState<FileEntry>({
         files: [],

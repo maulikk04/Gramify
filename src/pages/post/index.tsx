@@ -33,11 +33,19 @@ const CreatePost: React.FunctionComponent<ICreatePostProps> = () => {
     photoUrl:user?.photoURL || "",
     date:new Date(),
   })
+  const [error, setError] = React.useState<string>('');
 
  const handleSubmit = async (e:React.MouseEvent<HTMLFormElement>)=>{
     e.preventDefault();
+    setError('');
+
     if (!user) {
       navigate('/login');
+      return;
+    }
+
+    if (!fileEntry.files.length) {
+      setError('Please select at an image');
       return;
     }
 
@@ -58,13 +66,12 @@ const CreatePost: React.FunctionComponent<ICreatePostProps> = () => {
         date: new Date()
       };
 
-      // Wait for the post to be created and get the reference
       await createPost(newPost);
-      
-      // Navigate after successful creation
+    
       navigate('/');
     } catch (error) {
       console.error("Error creating post:", error);
+      setError('Failed to create post. Please try again.');
     }
  }
 
@@ -88,15 +95,26 @@ const CreatePost: React.FunctionComponent<ICreatePostProps> = () => {
                 </CardHeader>
                 <div className='p-8'>
                   <form onSubmit={handleSubmit}>
+                    {error && (
+                      <div className="mb-4 p-2 text-sm text-red-500 bg-red-50 rounded text-center">
+                        {error}
+                      </div>
+                    )}
                     <div className='flex flex-col'>
                       <Label className='mb-4' htmlFor='caption'>Photo Caption</Label>
                       <Textarea className='mb-8' id="caption" placeholder="What's in your photo!" value={post.caption} onChange={(e:React.ChangeEvent<HTMLTextAreaElement>)=>setPost({...post, caption:e.target.value})} />
                     </div>
                     <div className='flex flex-col'>
-                      <Label className='mb-4' htmlFor='photo'>Photos</Label>
+                      <Label className='mb-4' htmlFor='photo'>Photos *</Label>
                       <FileUploader fileEntry={fileEntry} onChange={setFileEntry} preview={true}/>
                     </div>
-                    <Button className='bg-gradient-to-r from-purple-400 to-pink-600 text-white mt-8 w-32' type='submit'>Post</Button>
+                    <Button 
+                      className='bg-gradient-to-r from-purple-400 to-pink-600 text-white mt-8 w-32' 
+                      type='submit'
+                      disabled={!fileEntry.files.length} 
+                    >
+                      Post
+                    </Button>
                   </form>
                 </div>
               </Card>

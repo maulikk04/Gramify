@@ -18,9 +18,19 @@ const NOTIFICATIONS = "notifications";
 
 export const createNotification = async (notification: Omit<Notification, 'id' | 'read' | 'timestamp'>) => {
     try {
+        // Get receiver's profile
         const userProfile = await getUserProfile(notification.receiverId);
-        
-        // Always send notifications for follow requests, accepts, and rejects
+        if (!userProfile) return;
+
+        // Default notification settings if not set
+        const notificationSettings = userProfile.notificationSettings || {
+            likes: true,
+            comments: true,
+            follows: true,
+            newPosts: true
+        };
+
+        // Always send notifications for follow-related actions
         const isFollowAction = [
             NotificationType.FOLLOW_REQUEST,
             NotificationType.FOLLOW_ACCEPT,
@@ -36,10 +46,7 @@ export const createNotification = async (notification: Omit<Notification, 'id' |
             return;
         }
 
-        if (!userProfile?.notificationSettings) return;
-        
-        const { notificationSettings } = userProfile;
-        
+        // Check notification settings for other types
         let shouldSend = false;
         switch (notification.type) {
             case NotificationType.LIKE:
@@ -55,6 +62,8 @@ export const createNotification = async (notification: Omit<Notification, 'id' |
             case NotificationType.NEW_POST:
                 shouldSend = notificationSettings.newPosts;
                 break;
+            default:
+                shouldSend = true;
         }
 
         if (shouldSend) {

@@ -60,6 +60,7 @@ export interface ProfileInfo {
 
 export interface UserProfile {
     userId: string;
+    email: string;  
     displayName: string;
     photoUrl: string;
     userBio: string;
