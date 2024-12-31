@@ -2,25 +2,36 @@ import { db, auth } from "@/firebaseConfig";
 import { Comment, CommentResponse, NotificationType } from "@/types";
 import { addDoc, collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import { createNotification } from './notification.service';
+import { getUserProfile } from "./user.service";
 
 const COLLECTION_NAME = "comments";
 
 export const createComment = async (comment: Comment, postUserId: string) => {
     try {
+        // Create the comment first
         const commentRef = await addDoc(collection(db, "comments"), comment);
 
-        // Create notification for post owner
+        // Send notification only if commenter is not the post owner
         const currentUser = auth.currentUser;
         if (currentUser && postUserId !== currentUser.uid) {
-            await createNotification({
-                type: NotificationType.COMMENT,
-                senderId: currentUser.uid,
-                receiverId: postUserId,
-                postId: comment.postId,
-                senderName: currentUser.displayName || "",
-                senderPhoto: currentUser.photoURL || "",
-                message: "commented on your post"
-            });
+            // Get user's profile data
+            const userProfile = await getUserProfile(currentUser.uid);
+            if (!userProfile) return commentRef;
+
+            try {
+                await createNotification({
+                    type: NotificationType.COMMENT,
+                    senderId: currentUser.uid,
+                    receiverId: postUserId,
+                    postId: comment.postId,
+                    senderName: userProfile.displayName,
+                    senderPhoto: userProfile.photoUrl,
+                    message: "commented on your post"
+                });
+            } catch (notifError) {
+                console.error("Error sending comment notification:", notifError);
+                // Don't throw here to prevent comment creation from failing
+            }
         }
 
         return commentRef;

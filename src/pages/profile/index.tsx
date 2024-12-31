@@ -30,7 +30,8 @@ const Profile: React.FunctionComponent<IProfileProps> = () => {
     followers: [],
     following: [],
     followRequests: [], 
-    isPrivate: false
+    isPrivate: false,
+    email: user?.email ? user.email : ""
   };
   const [userInfo, setUserInfo] = React.useState<ProfileResponse>(initialUserInfo);
   const isFollowing = userInfo.followers?.includes(user?.uid || '');
@@ -87,6 +88,17 @@ const Profile: React.FunctionComponent<IProfileProps> = () => {
 
   const renderPost = () => {
     return data.map((item) => {
+      // Add null check for photos array
+      if (!item.photos || !item.photos.length || !item.photos[0].cdnUrl) {
+        return (
+          <div key={item.id} className='relative cursor-pointer'>
+            <div className='w-full h-full aspect-square bg-gray-100 flex items-center justify-center'>
+              <span className="text-gray-400">No image available</span>
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div key={item.id} className='relative cursor-pointer' onClick={()=>navigate(`/post/${item.id}`)}>
           <div className='absolute group transition-all duration-200 bg-transparent hover:bg-slate-950 hover:bg-opacity-75 top-0 bottom-0 left-0 right-0 w-full h-full '>
@@ -95,7 +107,11 @@ const Profile: React.FunctionComponent<IProfileProps> = () => {
               <div className='hidden group-hover:block text-white'>{item.likes} likes</div>
             </div>
           </div>
-          <img src={`${item.photos[0].cdnUrl}/-/format/auto/-/quality/smart/-/resize/300x300/`} />
+          <img 
+            src={item.photos[0].cdnUrl} 
+            alt={item.caption || 'Post image'}
+            className="w-full h-full object-cover aspect-square"
+          />
         </div>
       );
     });
@@ -103,6 +119,17 @@ const Profile: React.FunctionComponent<IProfileProps> = () => {
 
   const renderBookmarkedPosts = () => {
     return bookmarkedPosts.map((item) => {
+      // Add the same null check for bookmarked posts
+      if (!item.photos || !item.photos.length || !item.photos[0].cdnUrl) {
+        return (
+          <div key={item.id} className='relative cursor-pointer'>
+            <div className='w-full h-full aspect-square bg-gray-100 flex items-center justify-center'>
+              <span className="text-gray-400">No image available</span>
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div key={item.id} className='relative cursor-pointer' onClick={()=>navigate(`/post/${item.id}`)}>
           <div className='absolute group transition-all duration-200 bg-transparent hover:bg-slate-950 hover:bg-opacity-75 top-0 bottom-0 left-0 right-0 w-full h-full '>
@@ -111,7 +138,11 @@ const Profile: React.FunctionComponent<IProfileProps> = () => {
               <div className='hidden group-hover:block text-white'>{item.likes} likes</div>
             </div>
           </div>
-          <img src={`${item.photos[0].cdnUrl}/-/format/auto/-/quality/smart/-/resize/300x300/`} />
+          <img 
+            src={item.photos[0].cdnUrl}
+            alt={item.caption || 'Post image'}
+            className="w-full h-full object-cover aspect-square"
+          />
         </div>
       );
     });

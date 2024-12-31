@@ -24,10 +24,15 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
     const [showComments, setShowComments] = useState(false);
     const navigate = useNavigate();
     const [likesInfo, setLikesInfo] = useState<{
-        likes:number,
-        isLike:boolean
-    }>({ likes:data.likes, 
-        isLike: user?.uid ? data.userlikes.includes(user.uid) : false});
+        likes: number,
+        userlikes: string[]
+    }>({ 
+        likes: data.likes, 
+        userlikes: data.userlikes 
+    });
+
+    const isLiked = user?.uid ? likesInfo.userlikes.includes(user.uid) : false;
+
     const [isFollowed, setIsFollowed] = useState(false);
     const [isBookmarked, setIsBookmarked] = useState(false);
 
@@ -87,7 +92,7 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
         if(!user?.uid) return;
         
         const newLikes = isVal ? likesInfo.likes + 1 : likesInfo.likes - 1;
-        const newUserLikes = [...data.userlikes];
+        const newUserLikes = [...likesInfo.userlikes];
         
         if(isVal) {
             newUserLikes.push(user.uid);
@@ -98,16 +103,24 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
             }
         }
 
-        await updateLikesOnPost(data.id, newUserLikes, newLikes, {
-            ...data,
-            likes: likesInfo.likes, 
-            userlikes: data.userlikes
-        });
+        try {
+            await updateLikesOnPost(data.id, newUserLikes, newLikes, {
+                ...data,
+                likes: likesInfo.likes,
+                userlikes: likesInfo.userlikes
+            });
 
-        setLikesInfo({
-            likes: newLikes,
-            isLike: !likesInfo.isLike
-        });
+            setLikesInfo({
+                likes: newLikes,
+                userlikes: newUserLikes
+            });
+        } catch (error) {
+            console.error("Error updating like:", error);
+            setLikesInfo({
+                likes: data.likes,
+                userlikes: data.userlikes
+            });
+        }
     };
 
     const loadComments = async () => {
@@ -172,11 +185,17 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
             </CardHeader>
             <CardContent className='p-0'>
                 <div className="w-full pb-[100%] relative">
-                    <img 
-                        src={data.photos? data.photos[0].cdnUrl : ""} 
-                        alt={data.caption}
-                        className="absolute inset-0 w-full h-full object-contain bg-black/5"
-                    />
+                    {data.photos && data.photos.length > 0 && data.photos[0].cdnUrl ? (
+                        <img 
+                            src={data.photos[0].cdnUrl} 
+                            alt={data.caption}
+                            className="absolute inset-0 w-full h-full object-contain bg-black/5"
+                        />
+                    ) : (
+                        <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-gray-100">
+                            <span className="text-gray-400">No image available</span>
+                        </div>
+                    )}
                 </div>
             </CardContent>
             <CardFooter className='flex flex-col p-3'>
@@ -184,8 +203,8 @@ const PostCard: React.FunctionComponent<IPostCardProps> = ({data}) => {
                     <div className='flex'>
                         <HeartIcon 
                             className={cn("mr-3", "cursor-pointer", 
-                            likesInfo.isLike ? "fill-red-500":"fill-none")} 
-                            onClick={()=>updateLike(!likesInfo.isLike)}
+                            isLiked ? "fill-red-500":"fill-none")} 
+                            onClick={()=>updateLike(!isLiked)}
                         />
                         <MessageCircle 
                             className="mr-3 cursor-pointer" 

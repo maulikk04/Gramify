@@ -122,7 +122,7 @@ const NotificationsPage = () => {
                         <div className="p-4 sm:p-8">
                             {notifications.length === 0 ? (
                                 <p className="text-center text-gray-500">No notifications yet</p>
-                            ) : (
+                            ) : (                           
                                 <div className="space-y-4">
                                     {notifications.map((notification) => (
                                         <div

@@ -13,7 +13,8 @@ export const createUserProfile = (user: UserProfile) => {
             followers: [],
             following: [],
             followRequests: [],
-            isPrivate: false
+            isPrivate: false,
+            email: user.email // Make sure email is included
         });
     } catch (error) {
         console.log(error);
@@ -190,17 +191,18 @@ export const sendFollowRequest = async (currentUserId: string, targetUserId: str
             followRequests: arrayUnion(currentUserId)
         });
 
-        const currentUser = auth.currentUser;
-        if (currentUser) {
-            await createNotification({
-                type: NotificationType.FOLLOW_REQUEST,
-                senderId: currentUserId,
-                receiverId: targetUserId,
-                senderName: currentUser.displayName || "",
-                senderPhoto: currentUser.photoURL || "",
-                message: "wants to follow you"
-            });
-        }
+        // Get current user's profile data first
+        const currentUserProfile = await getUserProfile(currentUserId);
+        if (!currentUserProfile) throw new Error("Current user profile not found");
+        
+        await createNotification({
+            type: NotificationType.FOLLOW_REQUEST,
+            senderId: currentUserId,
+            receiverId: targetUserId,
+            senderName: currentUserProfile.displayName || "",
+            senderPhoto: currentUserProfile.photoUrl || "",
+            message: "wants to follow you"
+        });
     } catch (error) {
         console.error("Error sending follow request:", error);
     }

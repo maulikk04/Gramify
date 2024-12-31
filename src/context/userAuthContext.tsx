@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../firebaseConfig"
 import { ProfileInfo } from "@/types";
 import { createUserProfile } from "@/repository/user.service";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where, updateDoc, doc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
 interface IUserAuthProviderProps {
@@ -30,18 +30,6 @@ const logIn = async (email: string, password: string) => {
     return userCredential;
 }
 
-const createInitialUserProfile = async (user: User) => {
-    return createUserProfile({
-        userId: user.uid,
-        displayName: user.displayName || "",
-        photoUrl: user.photoURL || "",
-        userBio: "Please update your bio",
-        followers: [],
-        following: [],
-        bookmarks: [] 
-    });
-};
-
 const sendVerificationEmail = (user: User) => {
     return sendEmailVerification(user);
 };
@@ -53,7 +41,20 @@ const resetPassword = (email: string) => {
 const signUp = async (email: string, password: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    await createInitialUserProfile(user);
+    
+    await createUserProfile({
+        userId: user.uid,
+        email: email,
+        displayName: user.displayName || "",
+        photoUrl: user.photoURL || "",
+        userBio: "Please update your bio",
+        followers: [],
+        following: [],
+        bookmarks: [],
+        isPrivate: false,
+        followRequests: []
+    });
+    
     await sendVerificationEmail(user);
     return userCredential;
 }
@@ -68,12 +69,29 @@ const googleSignIn = async () => {
         const result = await signInWithPopup(auth, googleAuthProvider);
         const user = result.user;
         
-        const q = query(collection(db, 'users'), where('userId', '==', user.uid));
-        const querySnapshot = await getDocs(q);
-        
-        if (querySnapshot.empty) {
+        if (!user.email) {
+            throw new Error("No email provided from Google");
+        }
+
+        // First check if there's an existing profile with this email
+        const emailQuery = query(collection(db, 'users'), where('email', '==', user.email));
+        const emailSnapshot = await getDocs(emailQuery);
+
+        if (!emailSnapshot.empty) {
+            // Found existing profile with this email
+            const existingDoc = emailSnapshot.docs[0];
+
+            // Update the existing profile with the new userId but keep other data
+            await updateDoc(doc(db, 'users', existingDoc.id), {
+                userId: user.uid,
+                // DO NOT update displayName and photoUrl here
+                // This preserves the user's custom profile
+            });
+        } else {
+            // No existing profile, create new one
             await createUserProfile({
                 userId: user.uid,
+                email: user.email,
                 displayName: user.displayName || "",
                 photoUrl: user.photoURL || "",
                 userBio: "Hello, I'm new here!",
@@ -83,7 +101,7 @@ const googleSignIn = async () => {
                 followRequests: []
             });
         }
-        
+
         return result;
     } catch (error) {
         console.error("Error in Google Sign In:", error);

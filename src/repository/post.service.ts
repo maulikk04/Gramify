@@ -139,30 +139,34 @@ export const updateLikesOnPost = async (id: string, newUserlikes: string[], newL
         const currentUser = auth.currentUser;
         if (!currentUser || currentPost.userId === currentUser.uid) return;
 
-        // Determine if this is a new like
-        const wasLiked = currentPost.userlikes.includes(currentUser.uid);
-        const isNowLiked = newUserlikes.includes(currentUser.uid);
+        // Get user's profile data
+        const userProfile = await getUserProfile(currentUser.uid);
+        if (!userProfile) return;
 
-        // Update the database
+        // Update the database first
         await updateDoc(doc(db, COLLECTION_NAME, id), {
             likes: newLikes,
             userlikes: newUserlikes
         });
 
-        // Only send notification for new likes
+        // Only send notification for new likes, not unlikes
+        const wasLiked = currentPost.userlikes.includes(currentUser.uid);
+        const isNowLiked = newUserlikes.includes(currentUser.uid);
+
         if (!wasLiked && isNowLiked) {
             await createNotification({
                 type: NotificationType.LIKE,
                 senderId: currentUser.uid,
                 receiverId: currentPost.userId!,
                 postId: id,
-                senderName: currentUser.displayName || "",
-                senderPhoto: currentUser.photoURL || "",
+                senderName: userProfile.displayName,
+                senderPhoto: userProfile.photoUrl,
                 message: "liked your post"
             });
         }
     } catch (error) {
         console.error("Error updating likes:", error);
+        throw error;
     }
 };
 
